@@ -455,7 +455,7 @@ html[data-sb="c"] .switch { margin-left: 0; }
 .stile-bottom { display: flex; flex-direction: column; gap: 10px; }
 .stile-name { font: 300 22px/1.15 var(--font-display); letter-spacing: -0.01em; }
 .stile.big .stile-name { font-size: 30px; }
-.stile-subs { display: flex; gap: 6px; flex-wrap: nowrap; overflow: hidden; position: relative; z-index: 1; }
+.stile-subs { display: flex; gap: 6px; flex-wrap: wrap; max-height: 26px; overflow: hidden; position: relative; z-index: 1; }
 .glass-pill {
   height: 28px; padding: 0 12px; border-radius: 14px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; white-space: nowrap;
   background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.26); color: #fff; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -697,3 +697,8 @@ html[data-sb="c"] .sb .user-card .round-btn { display: none !important; }
 .kpis b.sm { font: 600 16px/1.5 var(--font); padding-top: 4px; }
 .btn.google { background: #fff; color: #1F1F1F; border: 1px solid #DADCE0; box-shadow: none; gap: 12px; font-weight: 500; }
 .btn.google:hover { background: #F8F9FA; opacity: 1; }
+/* подкатегории на плитке: показываем только те, что помещаются целиком (лишние уходят на скрытую вторую строку) */
+.stile-subs .glass-pill { max-width: 100%; overflow: hidden; text-overflow: ellipsis; display: inline-block; line-height: 24px; }
+/* плашки на фото читаются и на светлых снимках */
+.stile:not(.nophoto) .glass-pill { background: rgba(0,0,0,.34); border-color: rgba(255,255,255,.22); }
+.stile:not(.nophoto) a.glass-pill:hover { background: rgba(0,0,0,.5); }
