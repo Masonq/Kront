@@ -570,8 +570,8 @@ html[data-sb="c"]:not(.sb-opening) .pickbar { left: calc(50% + (var(--sb-w-c) + 
 html[data-sb="c"]:not(.sb-opening) .sb .sb-brand .nut { transform: rotate(-360deg); }
 .sb-toggle svg { transition: transform var(--sb-dur) var(--sb-ease); }
 /* закрытие: подписи гаснут, потом панель сужается; открытие: панель расширяется, потом подписи проявляются */
-html.sb-closing .sb .hide-c, html.sb-closing .sb .txt { opacity: 0; transition: opacity .14s ease; }
-html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt { animation: sb-fade .28s ease both; }
+html.sb-closing .sb .hide-c, html.sb-closing .sb .txt, html.sb-closing .sb .sb-foot, html.sb-closing .sb .sb-div { opacity: 0; transition: opacity .14s ease; }
+html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, html.sb-reveal .sb .sb-foot, html.sb-reveal .sb .sb-div { animation: sb-fade .28s ease both; }
 @keyframes sb-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 899px) {
   .sb.open .sb-brand .nut { animation: nut-turn var(--sb-dur) var(--sb-ease); }
@@ -583,3 +583,7 @@ html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt { animation: sb-fade .28s ea
 }
 .sb-item { transition: width .3s var(--sb-ease), background-color .15s ease; }
 @media (prefers-reduced-motion: reduce) { .sb-item { transition: none; } }
+/* свёрнутый вид: всё держится в колонке 46px слева, чтобы при расширении панели ничего не «уплывало» к центру */
+html[data-sb="c"] .sb-head { width: 46px; }
+html[data-sb="c"] .sb .sb-label.hide-c { margin: 0 0 0 7px; }
+html[data-sb="c"] .sb-row, html[data-sb="c"] .user-card { width: 46px; }
