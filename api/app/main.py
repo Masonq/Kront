@@ -7,8 +7,10 @@ from sqlalchemy.orm import Session
 from .db import get_db
 from . import models as m
 from .seed import run as seed_run
+from .account import router as account_router, start_bot, current_user, match_masters
 
-app = FastAPI(title="Kront API", version="0.1.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Kront API", version="0.2.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app.include_router(account_router)
 
 CYR = {"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ђ": "dj", "е": "e", "ж": "z", "з": "z", "и": "i", "ј": "j", "к": "k",
        "л": "l", "љ": "lj", "м": "m", "н": "n", "њ": "nj", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "ћ": "c", "у": "u",
@@ -30,6 +32,7 @@ def norm_lat(s: str) -> str:
 @app.on_event("startup")
 def _startup():
     seed_run()
+    start_bot()
     from .db import SessionLocal
     with SessionLocal() as db:
         for c in db.scalars(select(m.Category).where(m.Category.parent_id.is_(None))):
@@ -110,7 +113,7 @@ def masters(lang: str = "sr", service: str | None = None, district: str | None =
             speaks: str | None = None, online: bool = False, urgent: bool = False, rating: float = 0,
             sort: str = "recommended", limit: int = Query(30, le=100), slugs: str | None = None,
             db: Session = Depends(get_db)):
-    q = select(m.Master)
+    q = select(m.Master).where(m.Master.hidden.is_(False))
     if slugs:
         wanted = [x for x in slugs.split(",") if x][:50]
         q = q.where(m.Master.slug.in_(wanted))
@@ -153,7 +156,7 @@ def masters(lang: str = "sr", service: str | None = None, district: str | None =
 
 @app.get("/api/v1/masters/{slug}")
 def master(slug: str, lang: str = "sr", db: Session = Depends(get_db)):
-    ms = db.scalar(select(m.Master).where(m.Master.slug == slug))
+    ms = db.scalar(select(m.Master).where(m.Master.slug == slug, m.Master.hidden.is_(False)))
     if not ms:
         raise HTTPException(404)
     reviews = db.scalars(select(m.Review).where(m.Review.master_id == ms.id).order_by(m.Review.created_at.desc())).all()
@@ -200,16 +203,18 @@ class RequestIn(BaseModel):
 
 
 @app.post("/api/v1/requests", status_code=201)
-def create_request(body: RequestIn, db: Session = Depends(get_db)):
+def create_request(body: RequestIn, db: Session = Depends(get_db), u: m.User | None = Depends(current_user)):
     c = db.scalar(select(m.Category).where(m.Category.slug == body.service)) if body.service else None
     d = db.scalar(select(m.District).where(m.District.slug == body.district)) if body.district else None
     ms = db.scalar(select(m.Master).where(m.Master.slug == body.master)) if body.master else None
     picked = [x for x in body.masters if db.scalar(select(m.Master.id).where(m.Master.slug == x))]
     r = m.ServiceRequest(category_id=c.id if c else None, district_id=d.id if d else None, master_id=ms.id if ms else None,
-                         masters=",".join(picked),
+                         masters=",".join(picked), user_id=u.id if u else None,
                          description=body.description.strip(), when=body.when, budget=body.budget,
                          contact_name=body.contact_name.strip(), contact=body.contact.strip(), lang=body.lang, urgent=body.urgent)
     db.add(r)
+    db.flush()
+    match_masters(db, r, picked or ([ms.slug] if ms else []))
     db.commit()
     return {"id": r.id, "status": r.status}
 

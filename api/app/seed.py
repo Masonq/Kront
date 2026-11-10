@@ -20,7 +20,8 @@ def seed_catalog(db):
 
 
 def seed_demo(db):
-    if db.scalar(select(func.count(m.Master.id))):
+    import os
+    if db.scalar(select(func.count(m.Master.id))) or os.path.exists(os.path.join(os.getenv("UPLOADS_DIR", "./uploads"), ".no_demo")):
         return
     cats = {c.slug: c for c in db.scalars(select(m.Category))}
     dists = {d.slug: d for d in db.scalars(select(m.District))}
@@ -41,7 +42,9 @@ def seed_demo(db):
 
 
 def run():
+    from . import migrate
     Base.metadata.create_all(engine)
+    migrate.run()
     with SessionLocal() as db:
         seed_catalog(db)
         seed_demo(db)
