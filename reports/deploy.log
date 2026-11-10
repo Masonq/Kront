@@ -1,4 +1,4 @@
-=== deploy 2026-11-10T11:35:39Z ===
+=== deploy 2026-11-10T11:36:49Z ===
 warning: redirecting to https://github.com/Masonq/Kront.git/
 Already up to date.
  Image kront-web Building 
@@ -8,7 +8,7 @@ Already up to date.
 #1 DONE 0.0s
 
 #2 [web internal] load build definition from Dockerfile
-#2 transferring dockerfile: 584B done
+#2 transferring dockerfile: 708B done
 #2 DONE 0.0s
 
 #3 [api internal] load build definition from Dockerfile
@@ -21,105 +21,153 @@ Already up to date.
 #5 [web internal] load metadata for docker.io/library/node:22-alpine
 #5 DONE 0.4s
 
-#4 [api internal] load metadata for docker.io/library/python:3.12-slim
-#4 DONE 0.4s
-
-#6 [api internal] load .dockerignore
-#6 transferring context: 2B done
+#6 [web internal] load .dockerignore
+#6 transferring context: 59B done
 #6 DONE 0.0s
 
-#7 [web internal] load .dockerignore
-#7 transferring context: 59B done
+#4 [api internal] load metadata for docker.io/library/python:3.12-slim
+#4 DONE 0.5s
+
+#7 [api internal] load .dockerignore
+#7 transferring context: 2B done
 #7 DONE 0.0s
 
-#8 [api internal] load build context
-#8 transferring context: 253B done
+#8 [web deps 1/4] FROM docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202
+#8 resolve docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202 0.0s done
 #8 DONE 0.0s
 
-#9 [web deps 1/4] FROM docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202
-#9 resolve docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202 0.0s done
+#9 [api internal] load build context
+#9 transferring context: 253B done
 #9 DONE 0.0s
 
-#10 [api 1/5] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
-#10 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
+#10 [web internal] load build context
+#10 transferring context: 4.36kB 0.0s done
 #10 DONE 0.0s
 
-#11 [api 2/5] WORKDIR /app
+#11 [web deps 2/4] WORKDIR /app
 #11 CACHED
 
-#12 [api 3/5] COPY requirements.txt .
+#12 [web deps 3/4] COPY package.json package-lock.json ./
 #12 CACHED
 
-#13 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
+#13 [web deps 4/4] RUN npm ci --no-audit --no-fund
 #13 CACHED
 
-#14 [api 5/5] COPY app ./app
+#14 [web build 3/5] COPY --from=deps /app/node_modules ./node_modules
 #14 CACHED
 
-#15 [web internal] load build context
-#15 transferring context: 3.68kB 0.0s done
+#15 [api 1/5] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#15 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
 #15 DONE 0.0s
 
 #16 [web build 4/5] COPY . .
-#16 CACHED
+#16 DONE 0.1s
 
-#17 [web stage-2 3/5] COPY --from=build /app/.next/standalone ./
+#17 [api 3/5] COPY requirements.txt .
 #17 CACHED
 
-#18 [web deps 2/4] WORKDIR /app
+#18 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
 #18 CACHED
 
-#19 [web deps 4/4] RUN npm ci --no-audit --no-fund
+#19 [api 2/5] WORKDIR /app
 #19 CACHED
 
-#20 [web deps 3/4] COPY package.json package-lock.json ./
+#20 [api 5/5] COPY app ./app
 #20 CACHED
 
-#21 [web build 3/5] COPY --from=deps /app/node_modules ./node_modules
-#21 CACHED
+#21 [api] exporting to image
+#21 exporting layers done
+#21 exporting manifest sha256:78caebb19ee92f7b58e2f5d3af6a671bd3e2a40394dc3e6361a5be01d54e3263 done
+#21 exporting config sha256:ef55ea5d5cf4c56d141d6e92273c8aac08f541d8cc65aa8017eb7e01e274cc3b done
+#21 exporting attestation manifest sha256:0d5b1b46688694a5aaf1373e3d6f3da3d08a8d945cbca25937b2212fbd342d98 0.0s done
+#21 exporting manifest list sha256:e7ceca1b7a53c6914d3432f0a5cf9f917b6fb29f4ab4af3627073d07b1440cd4 done
+#21 naming to docker.io/library/kront-api:latest done
+#21 unpacking to docker.io/library/kront-api:latest 0.0s done
+#21 DONE 0.1s
 
 #22 [web build 5/5] RUN npx next build
-#22 CACHED
+#22 ...
 
-#23 [web stage-2 4/5] COPY --from=build /app/.next/static ./.next/static
-#23 CACHED
+#23 [api] resolving provenance for metadata file
+#23 DONE 0.0s
 
-#24 [web stage-2 5/5] COPY --from=build /app/public ./public
-#24 CACHED
+#22 [web build 5/5] RUN npx next build
+#22 2.977    ▲ Next.js 15.1.6
+#22 2.978 
+#22 3.065    Creating an optimized production build ...
+#22 32.13  ✓ Compiled successfully
+#22 32.15    Linting and checking validity of types ...
+#22 42.28    Collecting page data ...
+#22 46.91    Generating static pages (0/4) ...
+#22 48.18    Generating static pages (1/4) 
+#22 48.18    Generating static pages (2/4) 
+#22 48.18    Generating static pages (3/4) 
+#22 48.18  ✓ Generating static pages (4/4)
+#22 48.84    Finalizing page optimization ...
+#22 48.84    Collecting build traces ...
+#22 72.13 
+#22 72.14 Route (app)                              Size     First Load JS
+#22 72.14 ┌ ○ /_not-found                          979 B           106 kB
+#22 72.14 ├ ƒ /[lang]                              2.51 kB         119 kB
+#22 72.14 ├ ƒ /[lang]/majstor/[slug]               1.42 kB         118 kB
+#22 72.14 ├ ƒ /[lang]/omiljeni                     2.48 kB         119 kB
+#22 72.14 ├ ƒ /[lang]/poruke                       177 B           109 kB
+#22 72.14 ├ ƒ /[lang]/postani-majstor              1.09 kB         118 kB
+#22 72.14 ├ ƒ /[lang]/usluge                       177 B           109 kB
+#22 72.14 ├ ƒ /[lang]/usluge/[slug]                1.62 kB         118 kB
+#22 72.14 ├ ƒ /[lang]/usluge/[slug]/[district]     1.62 kB         118 kB
+#22 72.14 ├ ƒ /[lang]/zahtev                       3.25 kB         120 kB
+#22 72.14 ├ ƒ /[lang]/zahtevi                      7.21 kB         116 kB
+#22 72.14 ├ ○ /robots.txt                          0 B                0 B
+#22 72.14 └ ƒ /sitemap.xml                         0 B                0 B
+#22 72.14 + First Load JS shared by all            105 kB
+#22 72.14   ├ chunks/4bd1b696-e6c47efb054a5181.js  52.9 kB
+#22 72.14   ├ chunks/517-aee9a4cc83d2d04d.js       50.5 kB
+#22 72.14   └ other shared chunks (total)          1.91 kB
+#22 72.14 
+#22 72.14 
+#22 72.14 ƒ Middleware                             32.1 kB
+#22 72.14 
+#22 72.14 ○  (Static)   prerendered as static content
+#22 72.14 ƒ  (Dynamic)  server-rendered on demand
+#22 72.14 
+#22 72.31 npm notice
+#22 72.31 npm notice New major version of npm available! 10.9.9 -> 12.2.2
+#22 72.31 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+#22 72.31 npm notice To update run: npm install -g npm@12.2.2
+#22 72.31 npm notice
+#22 DONE 72.6s
 
-#25 [web] exporting to image
-#25 exporting layers done
-#25 exporting manifest sha256:a0e0b5ceb30d916b8990731e429e287d2c53594c4cf3049fa186057263fd4dbf done
-#25 exporting config sha256:8decc1181baafc392c10913dc9b9e1b2ddbe888a0aa824dca605547921b27085
-#25 ...
+#11 [web deps 2/4] WORKDIR /app
+#11 CACHED
 
-#26 [api] exporting to image
-#26 exporting layers done
-#26 exporting manifest sha256:78caebb19ee92f7b58e2f5d3af6a671bd3e2a40394dc3e6361a5be01d54e3263 done
-#26 exporting config sha256:ef55ea5d5cf4c56d141d6e92273c8aac08f541d8cc65aa8017eb7e01e274cc3b done
-#26 exporting attestation manifest sha256:1c8981e6cc3f4e1c8852b15a653b92c63a9d80c0627d5c86eae660548f441f88 0.0s done
-#26 exporting manifest list sha256:51057e729add3d872461663b9b1d31806e6e18181af48bbed0534f1f609b1f20 done
-#26 naming to docker.io/library/kront-api:latest done
-#26 unpacking to docker.io/library/kront-api:latest 0.0s done
-#26 DONE 0.2s
+#24 [web stage-2 3/5] COPY --from=build /app/.next/standalone ./
+#24 DONE 0.6s
 
-#25 [web] exporting to image
-#25 exporting config sha256:8decc1181baafc392c10913dc9b9e1b2ddbe888a0aa824dca605547921b27085 done
-#25 exporting attestation manifest sha256:9d20cca0608f9996a9a418ba70de925f28c54b784f5745f9817a23e4921638f0 0.0s done
-#25 exporting manifest list sha256:16f0c7221a3ea97daf4745b361a0c952007cf9865a3c5f8947be14fa3cb8e10c 0.0s done
-#25 naming to docker.io/library/kront-web:latest done
-#25 unpacking to docker.io/library/kront-web:latest 0.0s done
-#25 DONE 0.2s
+#25 [web stage-2 4/5] COPY --from=build /app/.next/static ./.next/static
+#25 DONE 0.1s
 
-#27 [api] resolving provenance for metadata file
-#27 DONE 0.0s
+#26 [web stage-2 5/5] COPY --from=build /app/public ./public
+#26 DONE 0.0s
+
+#27 [web] exporting to image
+#27 exporting layers
+#27 exporting layers 3.0s done
+#27 exporting manifest sha256:e62605bf3632a2fe1d07f40ed120dc0102eab68a97384865058011ef10c657e1 done
+#27 exporting config sha256:4760ea45a6d602168c3ae5763458f13e6ebc30b73b0a44fa21893235d283caf6 done
+#27 exporting attestation manifest sha256:5fe81b24a7e94882bbc12b2e29eb7cc72321abcbc8190f5596aea4309c890d0a 0.0s done
+#27 exporting manifest list sha256:86f33c9cbadc597f2bcb880b0dfe76588e108f8a84281b514e5e08dd68990284 0.0s done
+#27 naming to docker.io/library/kront-web:latest done
+#27 unpacking to docker.io/library/kront-web:latest
+#27 unpacking to docker.io/library/kront-web:latest 1.2s done
+#27 DONE 4.2s
 
 #28 [web] resolving provenance for metadata file
 #28 DONE 0.0s
  Image kront-api Built 
  Image kront-web Built 
- Container kront-db-1 Running 
  Container kront-api-1 Running 
+ Container kront-db-1 Running 
  Container kront-web-1 Recreate 
  Container kront-web-1 Recreated 
  Container kront-db-1 Waiting 
@@ -129,17 +177,14 @@ Already up to date.
 -> домен: kront.89-208-113-147.sslip.io -> 127.0.0.1:8120
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
- * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
- * Donating to EFF:                    https://eff.org/donate-le
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -> контейнеры:
 SERVICE   STATE     STATUS
-api       running   Up About a minute
-db        running   Up 16 minutes (healthy)
-web       running   Up 24 seconds
+api       running   Up 4 minutes
+db        running   Up 18 minutes (healthy)
+web       running   Up 8 seconds
 -> проверки:
 -> порт сайта: 8120
-500 /api/health
+200 /api/health
 200 /sr
 200 /ru
 200 /sr-cyrl
@@ -149,23 +194,24 @@ web       running   Up 24 seconds
 200 /ru/zahtev
 200 /ru/postani-majstor
 200 /sitemap.xml
+200 POST /api/v1/search (через сайт)
 -> на порту отвечает именно Kront
 -> снаружи по домену:
 301 http://kront.89-208-113-147.sslip.io/ru
 200 https://kront.89-208-113-147.sslip.io/ru
 -> последние логи api:
-api-1  | INFO:     172.21.0.4:49270 - "GET /api/v1/districts?lang=ru HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:49268 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar&sort=recommended HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:49270 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:49268 - "GET /api/v1/masters/marko-petrovic?lang=ru HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:49268 - "GET /api/v1/sitemap?lang=sr HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/catalog?lang=sr HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/masters?lang=sr&limit=8 HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/masters?lang=ru&limit=8 HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/catalog?lang=ru HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/category/vodoinstalacije?lang=ru HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/districts?lang=ru HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar&sort=recommended HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/masters/marko-petrovic?lang=ru HTTP/1.1" 200 OK
-api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/sitemap?lang=sr HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34936 - "GET /api/v1/catalog?lang=sr HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34952 - "GET /api/v1/masters?lang=sr&limit=8 HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34954 - "GET /api/v1/search?q=kran&lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34962 - "GET /api/v1/masters?lang=ru&limit=8 HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34956 - "GET /api/v1/catalog?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:56952 - "GET /api/health HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:56946 - "GET /api/v1/search?q=%D1%82%D0%B5%D1%87%D1%91%D1%82%20%D0%BA%D1%80%D0%B0%D0%BD&lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34962 - "GET /api/v1/districts?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34956 - "GET /api/v1/category/vodoinstalacije?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34956 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar&sort=recommended HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34962 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:34956 - "GET /api/v1/masters/marko-petrovic?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:56964 - "POST /api/v1/master-leads HTTP/1.1" 201 Created
+api-1  | INFO:     172.21.0.4:34956 - "GET /api/v1/sitemap?lang=sr HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:56976 - "GET /api/v1/search?q=kran&lang=ru HTTP/1.1" 200 OK
