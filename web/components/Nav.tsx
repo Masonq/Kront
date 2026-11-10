@@ -27,7 +27,7 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         if (document.documentElement.dataset.sb === "c") toggleSb();
-        setTimeout(() => (document.getElementById("sb-q") as HTMLInputElement | null)?.focus(), 230);
+        setTimeout(() => (document.getElementById("sb-q") as HTMLInputElement | null)?.focus(), 520);
       }
     };
     window.addEventListener("keydown", k);
@@ -38,11 +38,26 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
 
   function toggleSb() {
     const el = document.documentElement;
-    const next = el.dataset.sb === "c" ? "e" : "c";
-    el.classList.add("sb-anim");
-    el.dataset.sb = next;
-    window.setTimeout(() => el.classList.remove("sb-anim"), 700);
-    setCookie("kront_sb", next);
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (el.classList.contains("sb-opening") || el.classList.contains("sb-closing")) return;
+    if (el.dataset.sb === "c") {
+      setCookie("kront_sb", "e");
+      if (calm) { el.dataset.sb = "e"; return; }
+      // 1) панель расширяется (иконки на месте, гайка делает оборот) → 2) раскладка меняется, подписи проявляются
+      el.classList.add("sb-opening");
+      window.setTimeout(() => {
+        el.dataset.sb = "e";
+        el.classList.remove("sb-opening");
+        el.classList.add("sb-reveal");
+        window.setTimeout(() => el.classList.remove("sb-reveal"), 320);
+      }, 430);
+    } else {
+      setCookie("kront_sb", "c");
+      if (calm) { el.dataset.sb = "c"; return; }
+      // 1) подписи гаснут → 2) панель сужается, гайка делает оборот в обратную сторону
+      el.classList.add("sb-closing");
+      window.setTimeout(() => { el.dataset.sb = "c"; el.classList.remove("sb-closing"); }, 140);
+    }
   }
   function toggleTheme() {
     const next = dark ? "light" : "dark";
@@ -89,7 +104,7 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
 
         <SearchBox lang={lang} id="sb-q" />
         <div className="sb-nav sb-search-c">
-          <button type="button" className="sb-item" onClick={() => { toggleSb(); setTimeout(() => document.getElementById("sb-q")?.focus(), 230); }} aria-label={t.search}>
+          <button type="button" className="sb-item" onClick={() => { toggleSb(); setTimeout(() => document.getElementById("sb-q")?.focus(), 520); }} aria-label={t.search}>
             <Icon name="search" stroke={2} /><span className="tip">{t.search}<span className="kbd">⌘K</span></span>
           </button>
         </div>
