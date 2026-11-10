@@ -562,20 +562,20 @@ html[data-sb="c"] .pickbar { left: calc(50% + (var(--sb-w-c) + 32px) / 2); }
   .pb-ava { width: 32px; height: 32px; }
 }
 
-/* ===== Анимация логотипа при открытии/закрытии сайдбара: гайка «закручивается» ===== */
-.sb .sb-brand .nut { transition: transform .6s cubic-bezier(.34, 1.56, .64, 1); transform-origin: 50% 50%; }
-html[data-sb="c"] .sb .sb-brand .nut { transform: rotate(-120deg); }
-.sb-toggle svg { transition: transform .3s ease; }
-html.sb-anim .sb .sb-name { animation: sb-name-in .35s ease .08s both; }
-html.sb-anim .sb .sb-brand .nut { animation: nut-pop .6s ease; }
-@keyframes sb-name-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
-@keyframes nut-pop { 0%, 100% { scale: 1; } 40% { scale: .82; } }
+/* ===== Анимация логотипа: гайка делает один полный оборот синхронно с панелью ===== */
+:root { --sb-ease: cubic-bezier(.4, 0, .2, 1); --sb-dur: .45s; }
+.sb { transition: width var(--sb-dur) var(--sb-ease), padding var(--sb-dur) var(--sb-ease); }
+.content { transition: padding-left var(--sb-dur) var(--sb-ease); }
+.sb .sb-brand .nut { transition: transform var(--sb-dur) var(--sb-ease); transform-origin: 50% 50%; }
+html[data-sb="c"] .sb .sb-brand .nut { transform: rotate(-360deg); }
+.sb-toggle svg { transition: transform var(--sb-dur) var(--sb-ease); }
+html.sb-anim .sb .sb-name { animation: sb-name-in .25s ease .2s both; }
+@keyframes sb-name-in { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 899px) {
-  .sb.open .sb-brand .nut { animation: nut-spin-in .6s cubic-bezier(.34, 1.56, .64, 1); }
-  .sb.open .sb-name { animation: sb-name-in .35s ease .1s both; }
+  .sb.open .sb-brand .nut { animation: nut-turn var(--sb-dur) var(--sb-ease); }
 }
-@keyframes nut-spin-in { from { transform: rotate(-120deg) scale(.8); } to { transform: rotate(0) scale(1); } }
+@keyframes nut-turn { from { transform: rotate(-360deg); } to { transform: rotate(0deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .sb .sb-brand .nut, .sb-toggle svg { transition: none; }
-  html.sb-anim .sb .sb-name, html.sb-anim .sb .sb-brand .nut, .sb.open .sb-brand .nut, .sb.open .sb-name { animation: none; }
+  .sb, .content, .sb .sb-brand .nut, .sb-toggle svg { transition: none; }
+  html.sb-anim .sb .sb-name, .sb.open .sb-brand .nut { animation: none; }
 }
