@@ -169,7 +169,7 @@ html[data-sb="c"] .sb-head { justify-content: center; padding: 0; }
 html[data-sb="c"] .sb-brand { flex: none; }
 html[data-sb="c"] .sb-toggle { position: absolute; top: 24px; right: -12px; width: 24px; height: 24px; background: var(--glass-solid); box-shadow: var(--glass-shadow); }
 html[data-sb="c"] .sb-toggle svg { transform: rotate(180deg); }
-html[data-sb="c"] .sb-item { width: 44px; height: 40px; padding: 0; justify-content: center; position: relative; }
+html[data-sb="c"] .sb-item { width: 44px; height: 40px; padding: 0 0 0 11px; justify-content: flex-start; position: relative; }
 html[data-sb="c"] .sb-item .txt { display: none; }
 html[data-sb="c"] .count-pill, html[data-sb="c"] .count-red { position: absolute; top: 4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; font-size: 10px; border: 2px solid var(--glass-solid); box-sizing: content-box; }
 html[data-sb="c"] .count-pill { background: var(--ink); color: var(--on-fill); }
@@ -583,7 +583,7 @@ html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, html.sb-reveal .sb .sb-foot
   .sb, .content, .sb .sb-brand .nut, .sb-toggle svg { transition: none; }
   html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, html.sb-settle .sb *, .sb.open .sb-brand .nut { animation: none; }
 }
-.sb-item { transition: width .3s var(--sb-ease), background-color .15s ease; }
+.sb-item { transition: width var(--sb-dur) var(--sb-ease), background-color .15s ease; }
 @media (prefers-reduced-motion: reduce) { .sb-item { transition: none; } }
 /* свёрнутый вид: всё держится в колонке 46px слева, чтобы при расширении панели ничего не «уплывало» к центру */
 html[data-sb="c"] .sb-head { width: 46px; }
