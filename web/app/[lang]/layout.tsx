@@ -40,7 +40,7 @@ export default async function Layout({ children, params }: { children: React.Rea
     <html lang={htmlLang(lang)} data-sb={sb} data-theme={theme} className={`${text.variable} ${display.variable}`}>
       <body>
         <div className="shell">
-          <Nav lang={lang} sections={sections} />
+          <Nav lang={lang} sections={sections} initialMode={jar.get("kront_mode")?.value === "master" ? "master" : "client"} />
           <main className="content" id="main">
             {children}
             <footer className="footer"><span>{t.footer}</span><span>© {new Date().getFullYear()} Kront</span></footer>

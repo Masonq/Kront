@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import Icon, { Nut } from "./Icon";
 import SearchBox from "./SearchBox";
 import { dict, tx, LANGS, type Lang } from "@/lib/i18n";
+import { d2 } from "@/lib/i18n2";
+import { useMe, setMode, api } from "@/lib/me";
+import { FAV, EMPTY_STR, useStored, write } from "@/lib/local";
+import { useRouter } from "next/navigation";
 import type { Section } from "@/lib/api";
 
 const LANG_LABEL: Record<Lang, string> = { sr: "Lat", "sr-cyrl": "Ћир", ru: "RU" };
@@ -13,8 +17,29 @@ function setCookie(k: string, v: string) {
   document.cookie = `${k}=${v}; path=/; max-age=31536000; samesite=lax`;
 }
 
-export default function Nav({ lang, sections }: { lang: Lang; sections: Section[] }) {
+export default function Nav({ lang, sections, initialMode }: { lang: Lang; sections: Section[]; initialMode: "client" | "master" }) {
   const t = dict(lang);
+  const t2 = d2(lang);
+  const router = useRouter();
+  const { me, badges } = useMe();
+  const [mode, setModeState] = useState<"client" | "master">(initialMode);
+  const fav = useStored<string[]>(FAV, EMPTY_STR);
+  const [favSynced, setFavSynced] = useState(false);
+  useEffect(() => {
+    if (!me || favSynced) return;
+    setFavSynced(true);
+    api<string[]>("/api/v1/me/favorites").then((srv) => {
+      const all = Array.from(new Set([...srv, ...fav]));
+      write(FAV, all);
+      if (all.length !== srv.length) api("/api/v1/me/favorites", { method: "PUT", body: { slugs: all } }).catch(() => {});
+    }).catch(() => {});
+  }, [me, favSynced, fav]);
+  useEffect(() => { if (me && favSynced) api("/api/v1/me/favorites", { method: "PUT", body: { slugs: fav } }).catch(() => {}); }, [fav, me, favSynced]);
+  const switchMode = () => {
+    const next = mode === "client" ? "master" : "client";
+    setMode(next); setModeState(next);
+    router.push(next === "master" ? `/${lang}/kabinet` : `/${lang}`);
+  };
   const path = usePathname() || "";
   const [drawer, setDrawer] = useState(false);
   const [dark, setDark] = useState(false);
@@ -116,11 +141,20 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
 
         <div className="sb-label hide-c">{t.main}</div>
         <nav className="sb-nav" aria-label={t.main}>
-          {item(`/${lang}`, "home", t.home, undefined, true)}
-          {item(`/${lang}/usluge`, "find", t.find)}
-          {item(`/${lang}/zahtevi`, "orders", t.orders)}
-          {item(`/${lang}/poruke`, "msg", t.messages)}
-          {item(`/${lang}/omiljeni`, "heart", t.favorites)}
+          {mode === "master" ? (<>
+            {item(`/${lang}/kabinet`, "orders", t2.dashboard, badges.requests ? <span className="count-pill">{badges.requests}</span> : undefined, true)}
+            {item(`/${lang}/poruke`, "msg", t.messages, badges.messages ? <span className="count-red">{badges.messages}</span> : undefined)}
+            {item(`/${lang}/kabinet/profil`, "user", t2.myProfile)}
+            {item(`/${lang}/kabinet/recenzije`, "star", t2.myReviews)}
+            {item(`/${lang}`, "home", t.home, undefined, true)}
+          </>) : (<>
+            {item(`/${lang}`, "home", t.home, undefined, true)}
+            {item(`/${lang}/usluge`, "find", t.find)}
+            {item(`/${lang}/zahtevi`, "orders", t.orders)}
+            {item(`/${lang}/poruke`, "msg", t.messages, badges.messages ? <span className="count-red">{badges.messages}</span> : undefined)}
+            {item(`/${lang}/omiljeni`, "heart", t.favorites, fav.length ? <span className="count-pill">{fav.length}</span> : undefined)}
+          </>)}
+          {me?.role === "admin" && item(`/${lang}/admin`, "shield", t2.admin)}
         </nav>
 
         <div className="sb-div" />
@@ -162,11 +196,21 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
             <span className="hide-c" style={{ display: "flex", alignItems: "center", gap: 12 }}><Icon name="moon" />{t.night}</span>
             <button type="button" role="switch" className="switch" aria-checked={dark} aria-label={t.night} onClick={toggleTheme} />
           </div>
-          <Link href={`/${lang}/postani-majstor`} className="user-card" aria-label={t.becomeMaster}>
-            <span className="ava"><Icon name="user" size={18} /></span>
-            <span className="who hide-c"><b>{t.guest}</b><span>{t.becomeMaster}</span></span>
-            <span className="hide-c" style={{ color: "var(--muted)", display: "inline-flex" }}><Icon name="right" size={18} stroke={2} /></span>
-          </Link>
+          {me ? (
+            <div className="user-card">
+              <Link href={mode === "master" ? `/${lang}/kabinet` : `/${lang}/zahtevi`} className="ava" aria-label={me.name}>
+                {me.photo ? <img src={me.photo} alt="" /> : (me.name || "?").slice(0, 1).toUpperCase()}
+              </Link>
+              <Link href={`/${lang}/vhod`} className="who hide-c"><b>{me.name || t2.login}</b><span>{mode === "master" ? t2.modeMaster : t2.modeClient}</span></Link>
+              <button type="button" className="round-btn hide-c" onClick={switchMode} aria-label={t2.switchMode} title={t2.switchMode}><Icon name="updown" size={16} stroke={2} /></button>
+            </div>
+          ) : (
+            <Link href={`/${lang}/vhod`} className="user-card" aria-label={t2.login}>
+              <span className="ava"><Icon name="user" size={18} /></span>
+              <span className="who hide-c"><b>{t.guest}</b><span>{t2.login}</span></span>
+              <span className="hide-c" style={{ color: "var(--muted)", display: "inline-flex" }}><Icon name="right" size={18} stroke={2} /></span>
+            </Link>
+          )}
         </div>
       </aside>
 
@@ -174,8 +218,10 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
         <Link href={`/${lang}`} aria-current={here(`/${lang}`, true) ? "page" : undefined}><Icon name="home" size={22} />{t.home}</Link>
         <Link href={`/${lang}/usluge`} aria-current={here(`/${lang}/usluge`) ? "page" : undefined}><Icon name="search" size={22} />{t.search}</Link>
         <Link href={`/${lang}/zahtev`} aria-label={t.newRequest}><span className="plus"><Icon name="plus" size={24} stroke={2.4} /></span></Link>
-        <Link href={`/${lang}/poruke`} aria-current={here(`/${lang}/poruke`) ? "page" : undefined}><Icon name="msg" size={22} />{t.messages}</Link>
-        <Link href={`/${lang}/zahtevi`} aria-current={here(`/${lang}/zahtevi`) ? "page" : undefined}><Icon name="orders" size={22} />{t.orders}</Link>
+        <Link href={`/${lang}/poruke`} aria-current={here(`/${lang}/poruke`) ? "page" : undefined}><Icon name="msg" size={22} />{t.messages}{badges.messages > 0 && <span className="badge">{badges.messages}</span>}</Link>
+        {mode === "master"
+          ? <Link href={`/${lang}/kabinet`} aria-current={here(`/${lang}/kabinet`) ? "page" : undefined}><Icon name="orders" size={22} />{t2.dashboard}{badges.requests > 0 && <span className="badge">{badges.requests}</span>}</Link>
+          : <Link href={`/${lang}/zahtevi`} aria-current={here(`/${lang}/zahtevi`) ? "page" : undefined}><Icon name="orders" size={22} />{t.orders}</Link>}
       </nav>
     </>
   );

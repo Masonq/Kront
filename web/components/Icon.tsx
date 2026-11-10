@@ -39,6 +39,7 @@ const P: Record<string, string> = {
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z"/>',
   updown: '<path d="m8 9 4-4 4 4"/><path d="m8 15 4 4 4-4"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h10"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
   send: '<path d="M4 12 20 4l-4 16-4-7z"/><path d="m12 13 8-9"/>',
 };
 

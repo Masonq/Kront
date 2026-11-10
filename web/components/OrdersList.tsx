@@ -4,10 +4,23 @@ import HeroCardClient from "./HeroCardClient";
 import { dict, tx, type Lang } from "@/lib/i18n";
 import { sectionPhoto } from "@/lib/sections";
 import { REQS, EMPTY_REQ, useStored, type SentReq } from "@/lib/local";
+import { useEffect, useState } from "react";
+import { api, useMe } from "@/lib/me";
+import { apiLang } from "@/lib/i18n";
 
 export default function OrdersList({ lang }: { lang: Lang }) {
   const t = dict(lang);
-  const reqs = useStored<SentReq[]>(REQS, EMPTY_REQ);
+  const local = useStored<SentReq[]>(REQS, EMPTY_REQ);
+  const { me } = useMe();
+  const [srv, setSrv] = useState<SentReq[] | null>(null);
+  useEffect(() => {
+    if (!me) return;
+    api<{ id: number; created_at: string; service: string; service_slug: string; district: string; when: string; description: string; masters: { slug: string; name: string; photo: string }[] }[]>(`/api/v1/me/requests?lang=${apiLang(lang)}`)
+      .then((rows) => setSrv(rows.map((r) => ({ id: r.id, at: r.created_at, service: r.service_slug, serviceName: r.service, section: "", district: r.district, when: r.when, description: r.description, masters: r.masters }))))
+      .catch(() => setSrv(null));
+  }, [me, lang]);
+  const ids = new Set((srv || []).map((r) => r.id));
+  const reqs = [...(srv || []), ...local.filter((r) => !ids.has(r.id))];
   if (!reqs.length) {
     return <HeroCardClient photo="/sec/dokumenti.jpg" title={t.ordersTitle} sub={t.ordersSub} text={t.ordEmpty} cta={t.newRequest} href={`/${lang}/zahtev`} />;
   }

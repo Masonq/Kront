@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Icon from "@/components/Icon";
 import { Ava } from "@/components/MasterCard";
 import FavButton from "@/components/Fav";
+import WriteChat from "@/components/WriteChat";
 import { api, fmtPrice, SITE } from "@/lib/api";
 import { dict, isLang, tx, type Lang } from "@/lib/i18n";
 import { alternates } from "@/lib/seo";
@@ -140,6 +141,7 @@ export default async function Page({ params }: P) {
             <div><span>{t.areas}</span><b>{m.district_list.length}</b><span>{tx(lang, m.district_list.slice(0, 2).map((d) => d.name).join(", "))}</span></div>
           </div>
           <Link href={req} className="btn lg">{t.offer}</Link>
+          <WriteChat lang={lang} slug={m.slug} />
           <p className="fine">{lang === "ru" ? "Оплата мастеру напрямую после работы. Kront не берёт комиссию." : tx(lang, "Plaćanje majstoru direktno posle posla. Kront ne uzima proviziju.")}</p>
         </aside>
       </div>

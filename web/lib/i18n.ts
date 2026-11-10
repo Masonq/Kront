@@ -274,7 +274,7 @@ const ru: Dict = {
   servicesN: (n: number) => { const a = n % 10, b = n % 100; return `${n} ${a === 1 && b !== 11 ? "услуга" : a >= 2 && a <= 4 && (b < 12 || b > 14) ? "услуги" : "услуг"}`; },
 };
 
-function deepCyr<T>(o: T): T {
+export function deepCyr<T>(o: T): T {
   if (typeof o === "string") return toCyr(o) as T;
   if (typeof o === "function") return ((...a: unknown[]) => toCyr((o as (...x: unknown[]) => string)(...a))) as T;
   if (Array.isArray(o)) return o.map(deepCyr) as T;
