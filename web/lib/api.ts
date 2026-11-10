@@ -9,10 +9,10 @@ export type District = { slug: string; name: string; loc: string };
 export type MasterCard = {
   slug: string; name: string; kind: string; photo: string; cover: string; level: number; rating: number; reviews: number;
   orders: number; reply_min: number; langs: string[]; online: boolean; urgent: boolean; demo: boolean; services: string[];
-  price_from: number; districts: string[]; works: string[];
+  price_from: number; districts: string[]; works: string[]; claimed: boolean; tg: string;
 };
 export type MasterFull = MasterCard & {
-  about: string; experience_years: number; warranty_months: number; claimed: boolean;
+  about: string; experience_years: number; warranty_months: number; claimed: boolean; source_url: string;
   service_list: { slug: string; name: string; price_from: number; unit: string }[];
   district_list: District[];
   review_list: { author: string; rating: number; text: string; service: string; tags: string[]; date: string; lang: string }[];

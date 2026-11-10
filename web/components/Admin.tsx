@@ -20,8 +20,16 @@ export default function Admin({ lang }: { lang: Lang }) {
   const t = d2(lang);
   const { me, loaded } = useMe();
   const [o, setO] = useState<O | null>(null);
-  const [tab, setTab] = useState<"requests" | "masters" | "leads" | "reviews" | "users">("requests");
-  const load = useCallback(() => api<O>("/api/v1/admin/overview").then(setO).catch(() => setO(null)), []);
+  const [tab, setTab] = useState<"requests" | "masters" | "leads" | "reviews" | "users" | "verif" | "collector">("requests");
+  const [docs, setDocs] = useState<{ id: number; kind: string; file: string; status: string; master: string; slug: string; level: number; at: string }[]>([]);
+  const [col, setCol] = useState<{ enabled: boolean; ai: boolean; sources: { id: number; handle: string; enabled: boolean; found: number; error: string; checked_at: string | null }[];
+    unclaimed: { id: number; slug: string; name: string; tg: string; invite: string; hidden: boolean; source: string }[]; removals: { id: number; master_id: number; contact: string; at: string }[] } | null>(null);
+  const [src, setSrc] = useState("");
+  const load = useCallback(() => {
+    api<O>("/api/v1/admin/overview").then(setO).catch(() => setO(null));
+    api<typeof docs>("/api/v1/admin/verification").then(setDocs).catch(() => {});
+    api<NonNullable<typeof col>>("/api/v1/admin/collector").then(setCol).catch(() => {});
+  }, []);
   useEffect(() => { if (me?.role === "admin") load(); }, [me, load]);
   if (!loaded) return <div className="nhero tall skeleton" />;
   if (!me) return <NeedLogin lang={lang} title={t.adminTitle} />;
@@ -29,7 +37,7 @@ export default function Admin({ lang }: { lang: Lang }) {
   if (!o) return <div className="skeleton-line" />;
   const patch = async (id: number, body: object) => { await api(`/api/v1/admin/masters/${id}`, { method: "PATCH", body }); load(); };
   const del = async (path: string) => { await api(path, { method: "DELETE" }); load(); };
-  const tabs: [typeof tab, string, number][] = [["requests", t.aRequests, o.stats.requests], ["masters", t.aMasters, o.stats.masters + o.stats.demo], ["leads", t.aLeads, o.stats.leads], ["reviews", t.aReviews, o.stats.reviews], ["users", t.aUsers, o.stats.users]];
+  const tabs: [typeof tab, string, number][] = [["requests", t.aRequests, o.stats.requests], ["masters", t.aMasters, o.stats.masters + o.stats.demo], ["leads", t.aLeads, o.stats.leads], ["reviews", t.aReviews, o.stats.reviews], ["users", t.aUsers, o.stats.users], ["verif", t.aVerif, docs.filter((d) => d.status === "pending").length], ["collector", t.aCollector, col?.unclaimed.length || 0]];
   return (
     <>
       <div className="list-head"><div><h1 className="h1">{t.adminTitle}</h1>
@@ -57,6 +65,31 @@ export default function Admin({ lang }: { lang: Lang }) {
           {tab === "users" && (<><thead><tr><th>№</th><th>Имя</th><th>Telegram / email</th><th>Роль</th><th>Дата</th></tr></thead>
             <tbody>{o.users.map((x) => <tr key={x.id}><td>{x.id}</td><td>{x.name}</td><td>{x.tg ? "@" + x.tg : x.email}</td><td>{x.role}</td><td>{dt(x.at)}</td></tr>)}</tbody></>)}
         </table>
+        {tab === "verif" && (
+          <table className="tbl"><thead><tr><th>Мастер</th><th>Документ</th><th>Статус</th><th /></tr></thead>
+            <tbody>{docs.map((d) => <tr key={d.id}><td><Link href={`/${lang}/majstor/${d.slug}`}>{d.master}</Link> · {t.aLevel} {d.level}</td>
+              <td><a href={d.file} target="_blank" rel="noopener"><img src={d.file} alt="" className="doc-thumb" /></a></td><td>{d.status}</td>
+              <td>{d.status === "pending" && <span className="chips">
+                <button type="button" className="btn sm" onClick={async () => { await api(`/api/v1/admin/verification/${d.id}`, { body: { approve: true } }); load(); }}>{t.aApprove}</button>
+                <button type="button" className="btn sm ghost" onClick={async () => { const note = prompt(t.aReject) || ""; await api(`/api/v1/admin/verification/${d.id}`, { body: { approve: false, note } }); load(); }}>{t.aReject}</button></span>}</td></tr>)}</tbody></table>
+        )}
+        {tab === "collector" && col && (
+          <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 18 }}>
+            {(!col.enabled || !col.ai) && <p className="hint">{t.aCollectorOff}</p>}
+            <form className="chips" onSubmit={async (e) => { e.preventDefault(); if (!src.trim()) return; await api("/api/v1/admin/collector/sources", { body: { handle: src } }).catch(() => {}); setSrc(""); load(); }}>
+              <input className="input" style={{ maxWidth: 320, minHeight: 40 }} value={src} onChange={(e) => setSrc(e.target.value)} placeholder={t.aSourcePh} />
+              <button type="submit" className="btn sm">{t.aAddSource}</button>
+            </form>
+            <table className="tbl"><tbody>{col.sources.map((x) => <tr key={x.id}><td>@{x.handle}</td><td>+{x.found}</td><td>{x.checked_at ? dt(x.checked_at) : "—"}</td><td className="err">{x.error}</td>
+              <td><button type="button" className="btn sm ghost" onClick={() => del(`/api/v1/admin/collector/sources/${x.id}`)}>{t.aDelete}</button></td></tr>)}</tbody></table>
+            <b>{t.aUnclaimed}</b>
+            <table className="tbl"><tbody>{col.unclaimed.map((x) => <tr key={x.id} className={x.hidden ? "dim" : ""}><td><Link href={`/${lang}/majstor/${x.slug}`}>{x.name}</Link></td>
+              <td>{x.tg ? "@" + x.tg : ""}</td><td>{x.invite || "—"}</td><td>{x.source && <a href={x.source} target="_blank" rel="noopener">t.me</a>}</td></tr>)}</tbody></table>
+            <b>{t.aRemovals}</b>
+            <table className="tbl"><tbody>{col.removals.map((x) => <tr key={x.id}><td>{dt(x.at)}</td><td>{x.contact}</td>
+              <td><button type="button" className="btn sm ghost" onClick={async () => { await api(`/api/v1/admin/removals/${x.id}/done`, { method: "POST" }); load(); }}>{t.aDone}</button></td></tr>)}</tbody></table>
+          </div>
+        )}
       </div>
     </>
   );

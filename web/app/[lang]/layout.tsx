@@ -24,7 +24,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     title: { default: `Kront — ${dict(l).brandSub}`, template: "%s — Kront" },
     description: dict(l).heroText,
-    icons: { icon: "/icon.svg" },
+    icons: { icon: "/icon.svg", apple: "/icon-192.png" },
+    manifest: "/manifest.webmanifest",
   };
 }
 

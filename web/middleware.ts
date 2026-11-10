@@ -13,4 +13,4 @@ export function middleware(req: NextRequest) {
   return NextResponse.redirect(url);
 }
 
-export const config = { matcher: ["/((?!api|_next|demo|sec|favicon.ico|icon.svg|robots.txt|sitemap.xml|manifest.webmanifest).*)"] };
+export const config = { matcher: ["/((?!api|_next|demo|sec|sw.js|icon-192.png|icon-512.png|favicon.ico|icon.svg|robots.txt|sitemap.xml|manifest.webmanifest).*)"] };

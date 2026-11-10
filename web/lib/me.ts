@@ -14,9 +14,27 @@ export async function refreshMe() {
     emit({ me: r.ok ? await r.json() : null, loaded: true });
   } catch { emit({ loaded: true }); }
 }
+function ding() {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(880, ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+    o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.4);
+  } catch { /* без звука */ }
+}
 export async function refreshBadges() {
   if (!state.me) return;
-  try { const r = await fetch("/api/v1/me/badges", { cache: "no-store" }); if (r.ok) emit({ badges: await r.json() }); } catch { /* сеть */ }
+  try {
+    const r = await fetch("/api/v1/me/badges", { cache: "no-store" });
+    if (!r.ok) return;
+    const b = await r.json();
+    const prev = state.badges.messages + state.badges.requests;
+    const now = b.messages + b.requests;
+    if (now > prev && state.loaded && document.visibilityState === "visible") ding();
+    document.title = (now ? `(${now}) ` : "") + document.title.replace(/^\(\d+\) /, "");
+    emit({ badges: b });
+  } catch { /* сеть */ }
 }
 
 export function useMe() {

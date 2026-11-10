@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "./Icon";
 import NeedLogin from "./NeedLogin";
+import PushBanner from "./PushBanner";
 import { apiLang, dict, tx, type Lang } from "@/lib/i18n";
 import { d2 } from "@/lib/i18n2";
 import { api, uploadPhoto, useMe, refreshBadges } from "@/lib/me";
@@ -36,6 +37,7 @@ export default function Chats({ lang, activeId }: { lang: Lang; activeId?: numbe
     <div className={`chats${activeId ? " has-active" : ""}`}>
       <aside className="chat-list" aria-label={t.chats}>
         <h1 className="h2" style={{ padding: "4px 8px 12px" }}>{t.chats}</h1>
+        <div style={{ padding: "0 4px 8px" }}><PushBanner lang={lang} /></div>
         {list === null ? <div className="skeleton-line" /> : list.length === 0 ? <p className="muted" style={{ padding: "0 8px", margin: 0 }}>{t.noChats}</p> :
           list.map((c) => (
             <Link key={c.id} href={`/${lang}/poruke/${c.id}`} className="chat-item" aria-current={c.id === activeId ? "page" : undefined}>
@@ -64,12 +66,24 @@ function Chat({ lang, id, onChange }: { lang: Lang; id: number; onChange: () => 
   const [offerOpen, setOfferOpen] = useState(false);
   const [of, setOf] = useState({ title: "", price: "", visit: "", details: "" });
   const end = useRef<HTMLDivElement>(null);
+  const [tr, setTr] = useState<Record<string, string>>({});
+  const [orig, setOrig] = useState<Record<number, boolean>>({});
+  const asked = useRef<Set<number>>(new Set());
+  const [aiOn, setAiOn] = useState(false);
+  useEffect(() => { api<{ translate: boolean }>("/api/v1/ai/status").then((r) => setAiOn(r.translate)).catch(() => {}); }, []);
   const lastCount = useRef(0);
 
   const load = useCallback(async () => {
     try { const r = await api<Conv>(`/api/v1/conversations/${id}`); setC(r); setErr(false); } catch { setErr(true); }
   }, [id]);
   useEffect(() => { load(); const h = setInterval(load, 3000); return () => clearInterval(h); }, [load]);
+  useEffect(() => {
+    if (!aiOn || !c) return;
+    const ids = c.messages.filter((m) => !m.mine && m.kind === "text" && !asked.current.has(m.id)).map((m) => m.id);
+    if (!ids.length) return;
+    ids.forEach((i) => asked.current.add(i));
+    api<Record<string, string>>(`/api/v1/conversations/${id}/translate`, { body: { ids, lang: apiLang(lang) } }).then((r) => setTr((x) => ({ ...x, ...r }))).catch(() => {});
+  }, [c, aiOn, id, lang]);
   useEffect(() => {
     if (c && c.messages.length !== lastCount.current) {
       lastCount.current = c.messages.length;
@@ -134,7 +148,9 @@ function Chat({ lang, id, onChange }: { lang: Lang; id: number; onChange: () => 
           }
           return (
             <div key={m.id} className={`bubble${m.mine ? " mine" : ""}${m.kind === "photo" ? " photo" : ""}`}>
-              {m.kind === "photo" ? <a href={m.body} target="_blank" rel="noopener"><img src={m.body} alt={t.photoMsg} /></a> : <span>{m.body}</span>}
+              {m.kind === "photo" ? <a href={m.body} target="_blank" rel="noopener"><img src={m.body} alt={t.photoMsg} /></a>
+                : tr[m.id] && !orig[m.id] ? <span>{tr[m.id]}</span> : <span>{m.body}</span>}
+              {tr[m.id] && <button type="button" className="tr-toggle" onClick={() => setOrig({ ...orig, [m.id]: !orig[m.id] })}>{orig[m.id] ? t.translated : `${t.autoTr} · ${t.original}`}</button>}
               <time>{hhmm(m.at)}</time>
             </div>
           );

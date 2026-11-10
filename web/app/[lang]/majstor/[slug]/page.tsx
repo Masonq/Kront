@@ -5,6 +5,8 @@ import Icon from "@/components/Icon";
 import { Ava } from "@/components/MasterCard";
 import FavButton from "@/components/Fav";
 import WriteChat from "@/components/WriteChat";
+import RemoveMe from "@/components/RemoveMe";
+import { d2 } from "@/lib/i18n2";
 import { api, fmtPrice, SITE } from "@/lib/api";
 import { dict, isLang, tx, type Lang } from "@/lib/i18n";
 import { alternates } from "@/lib/seo";
@@ -22,7 +24,7 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
     title: `${name} — ${tx(lang, m.services[0] || "")}`,
     description: `${tx(lang, m.about)} ${m.rating.toFixed(1)} ★, ${t.reviewsN(m.reviews)}.`,
     alternates: alternates(lang, `majstor/${slug}`),
-    robots: m.demo ? { index: false, follow: true } : undefined,
+    robots: m.demo || !m.claimed ? { index: false, follow: true } : undefined,
     openGraph: { images: m.cover ? [`${SITE}${m.cover}`] : undefined },
   };
 }
@@ -45,11 +47,11 @@ export default async function Page({ params }: P) {
 
   return (
     <>
-      {!m.demo && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />}
+      {!m.demo && m.claimed && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />}
       <div className="profile">
         <div>
           <section className="p-hero">
-            {m.cover && <img src={m.cover} alt="" />}
+            <img src={m.cover || "/demo/w-bw2.jpg"} alt="" />
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Link href={`/${lang}/usluge/${m.service_list[0]?.slug || ""}`} className="glass-btn" aria-label={t.back}><Icon name="left" size={18} stroke={2.2} /></Link>
               {m.demo && <span className="demo-tag" style={{ background: "rgba(255,255,255,.16)", color: "#fff" }}>{t.demo}</span>}
@@ -59,12 +61,12 @@ export default async function Page({ params }: P) {
               <h1>{name}</h1>
               <span className="role">{role}</span>
             </div>
-            <div className="p-stats">
+            {m.claimed && <div className="p-stats">
               <div className="p-stat"><b>{m.rating.toFixed(1).replace(".", ",")}</b><span>{t.reviewsN(m.reviews)}</span></div>
               <div className="p-stat"><b>{m.orders}</b><span>{t.ordersLabel}</span></div>
               <div className="p-stat"><b>~{m.reply_min} {lang === "ru" ? "мин" : tx(lang, "min")}</b><span>{t.replyLabel}</span></div>
-              <div className="p-stat"><b>{t.level[Math.min(m.level, 3)]}</b><span>{t.verifLabel}</span></div>
-            </div>
+              <div className="p-stat"><b className="sm">{t.level[Math.min(m.level, 3)]}</b><span>{t.verifLabel}</span></div>
+            </div>}
           </section>
 
           <div className="panel" style={{ marginTop: 16 }}>
@@ -140,8 +142,15 @@ export default async function Page({ params }: P) {
             <div><span>{t.services}</span><b>{t.from} {fmtPrice(m.price_from)}</b><span>RSD</span></div>
             <div><span>{t.areas}</span><b>{m.district_list.length}</b><span>{tx(lang, m.district_list.slice(0, 2).map((d) => d.name).join(", "))}</span></div>
           </div>
-          <Link href={req} className="btn lg">{t.offer}</Link>
-          <WriteChat lang={lang} slug={m.slug} />
+          {m.claimed ? (<>
+            <Link href={req} className="btn lg">{t.offer}</Link>
+            <WriteChat lang={lang} slug={m.slug} />
+          </>) : (<>
+            <div className="ad-note"><b>{d2(lang).fromAd}</b><span>{d2(lang).fromAdText}</span>
+              {m.source_url && <a href={m.source_url} target="_blank" rel="noopener nofollow">{d2(lang).source}</a>}</div>
+            {m.tg && <a href={`https://t.me/${m.tg}`} target="_blank" rel="noopener nofollow" className="btn lg">{d2(lang).writeTg}</a>}
+            <RemoveMe lang={lang} slug={m.slug} />
+          </>)}
           <p className="fine">{lang === "ru" ? "Оплата мастеру напрямую после работы. Kront не берёт комиссию." : tx(lang, "Plaćanje majstoru direktno posle posla. Kront ne uzima proviziju.")}</p>
         </aside>
       </div>

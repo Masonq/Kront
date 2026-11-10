@@ -2,6 +2,7 @@ import Link from "next/link";
 import Icon from "./Icon";
 import FavButton from "./Fav";
 import { PickButton } from "./Pick";
+import { d2 } from "@/lib/i18n2";
 import { dict, tx, type Lang } from "@/lib/i18n";
 import { fmtPrice, type MasterCard as M } from "@/lib/api";
 
@@ -36,8 +37,9 @@ export default function MasterCard({ lang, m }: { lang: Lang; m: M }) {
       <div className="cover">
         {m.cover ? <img src={m.cover} alt="" loading="lazy" /> : null}
         {m.demo && <span className="demo-tag">{t.demo}</span>}
+        {!m.claimed && <span className="demo-tag">{d2(lang).fromAd}</span>}
         <FavButton slug={m.slug} label={t.favorite} />
-        <PickButton lang={lang} m={{ slug: m.slug, name: m.name, photo: m.photo }} />
+        {m.claimed && <PickButton lang={lang} m={{ slug: m.slug, name: m.name, photo: m.photo }} />}
       </div>
       <div className="body">
         <div className="who">
@@ -54,7 +56,8 @@ export default function MasterCard({ lang, m }: { lang: Lang; m: M }) {
         </div>
         <div className="foot">
           <span className="price">{m.price_from ? `${t.from} ${fmtPrice(m.price_from)} RSD` : ""}</span>
-          <Link href={`/${lang}/zahtev?master=${m.slug}`} className="btn sm">{t.write}</Link>
+          {m.claimed ? <Link href={`/${lang}/zahtev?master=${m.slug}`} className="btn sm">{t.write}</Link>
+            : m.tg ? <a href={`https://t.me/${m.tg}`} target="_blank" rel="noopener nofollow" className="btn sm ghost">{d2(lang).writeTg}</a> : null}
         </div>
       </div>
     </article>

@@ -702,3 +702,33 @@ html[data-sb="c"] .sb .user-card .round-btn { display: none !important; }
 /* плашки на фото читаются и на светлых снимках */
 .stile:not(.nophoto) .glass-pill { background: rgba(0,0,0,.34); border-color: rgba(255,255,255,.22); }
 .stile:not(.nophoto) a.glass-pill:hover { background: rgba(0,0,0,.5); }
+
+/* ===== Пуш-баннер, проверка, перевод, профиль из объявления ===== */
+.push-banner { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 14px; border-radius: 20px; background: linear-gradient(135deg, var(--sand) 0%, var(--sand2) 100%); margin-bottom: 16px; }
+.push-banner .pb-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--paper); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.push-banner .pb-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--muted); }
+.push-banner .pb-txt b { font-size: 14px; color: var(--ink); }
+.push-banner .round-btn { background: transparent; border: 0; color: var(--muted); }
+.chat-list .push-banner { flex-wrap: wrap; }
+.levels { display: flex; flex-direction: column; gap: 12px; }
+.lv { display: flex; align-items: flex-start; gap: 14px; padding: 18px; border-radius: 22px; border: 1px solid var(--line); }
+.lv.done { background: linear-gradient(135deg, var(--sand) 0%, var(--sand2) 100%); border-color: transparent; }
+.lv-ic { width: 44px; height: 44px; border-radius: 14px; background: var(--field); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lv.done .lv-ic { background: var(--fill); color: var(--on-fill); }
+.lv-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.lv-body b { font-size: 16px; }
+.lv-body p { margin: 0; font-size: 14px; color: var(--muted); }
+.lv-st { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.lv-st.ok { color: var(--green); }
+.bar { width: 100%; max-width: 320px; height: 6px; border-radius: 3px; background: var(--field); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--fill); border-radius: 3px; }
+.tr-toggle { align-self: flex-start; border: 0; background: transparent; padding: 0; font-size: 11.5px; color: var(--muted); text-decoration: underline; }
+.bubble.mine .tr-toggle { color: inherit; opacity: .7; }
+.ad-note { padding: 14px; border-radius: 20px; background: var(--field); display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+.ad-note b { color: var(--ink); font-size: 14px; }
+.ad-note a { color: var(--ink); text-decoration: underline; }
+.linklike { border: 0; background: transparent; padding: 0; font-size: 13px; color: var(--muted); text-decoration: underline; align-self: center; }
+.doc-thumb { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; }
+@media (max-width: 899px) { .lv { flex-wrap: wrap; } .lv-st { margin-left: 58px; } }
+.p-stat b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-stat b.sm { font: 600 15px/1.55 var(--font); padding-top: 3px; }

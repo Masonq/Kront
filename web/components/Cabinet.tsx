@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Icon from "./Icon";
 import MasterForm from "./MasterForm";
 import NeedLogin from "./NeedLogin";
+import PushBanner from "./PushBanner";
 import { apiLang, dict, tx, type Lang } from "@/lib/i18n";
 import { d2 } from "@/lib/i18n2";
 import { api, useMe, refreshBadges } from "@/lib/me";
@@ -75,7 +76,7 @@ export default function Cabinet({ lang, sections, districts, view }: { lang: Lan
       const r = await api<{ conversation: number | null }>(`/api/v1/me/master/requests/${id}/${a}`, { method: "POST" });
       refreshBadges();
       if (a === "take" && r.conversation) router.push(`/${lang}/poruke/${r.conversation}`); else load();
-    } catch { /* сеть */ }
+    } catch (e) { if ((e as { status?: number }).status === 409) alert(t.alreadyTaken); load(); }
   };
   const fresh = reqs.filter((r) => r.match === "pending");
   const old = reqs.filter((r) => r.match !== "pending");
@@ -83,6 +84,7 @@ export default function Cabinet({ lang, sections, districts, view }: { lang: Lan
   return (<>
     {hero(ms.name, t.dashboard)}
     <div className="sheet">
+      <PushBanner lang={lang} />
       <div className="kpis">
         <div><b>{ms.rating ? ms.rating.toFixed(1).replace(".", ",") : "—"}</b><span>{t.statsRating}</span></div>
         <div><b>{ms.reviews}</b><span>{t.statsReviews}</span></div>
@@ -91,6 +93,7 @@ export default function Cabinet({ lang, sections, districts, view }: { lang: Lan
       </div>
       <div className="chips" style={{ marginTop: 16 }}>
         <Link href={`/${lang}/kabinet/profil`} className="btn sm ghost"><Icon name="user" size={16} />{t.myProfile}</Link>
+        <Link href={`/${lang}/kabinet/provera`} className="btn sm ghost"><Icon name="shield" size={16} />{t.verif}</Link>
         <Link href={`/${lang}/majstor/${ms.slug}`} className="btn sm ghost">{t.viewProfile}</Link>
       </div>
       <h2 className="h2" style={{ margin: "28px 0 14px" }}>{t.newReqs}{fresh.length > 0 && <span className="count-red" style={{ marginLeft: 10, verticalAlign: "middle" }}>{fresh.length}</span>}</h2>
@@ -102,7 +105,7 @@ export default function Cabinet({ lang, sections, districts, view }: { lang: Lan
               <div className="row">
                 <img src={sectionPhoto(sections.find((s) => s.children.some((c) => c.slug === r.service_slug))?.slug) || "/demo/hero.jpg"} alt="" className="thumb" />
                 <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                  <span className="status-pill">{r.urgent ? "⚡ " : ""}{r.match === "pending" ? t.pending : r.match === "taken" ? t.taken : t.declined} · №{r.id}</span>
+                  <span className="status-pill">{r.urgent ? "⚡ " : ""}{r.match === "pending" ? t.pending : r.match === "taken" ? t.taken : r.match === "closed" ? t.alreadyTaken.split(".")[0] : t.declined} · №{r.id}</span>
                   <b className="oc-title">{tx(lang, r.service || secName(r.service_slug))}</b>
                   <span className="oc-sub">{r.description}</span>
                 </div>
