@@ -165,14 +165,15 @@ html[data-sb="c"] .content { padding-left: calc(var(--sb-w-c) + 48px); max-width
 html[data-sb="c"] .sb { width: var(--sb-w-c); padding: 14px 13px; overflow: visible; }
 html[data-sb="c"] .sb .hide-c { display: none !important; }
 html[data-sb="c"] .sb-head { justify-content: center; padding: 0; }
-html[data-sb="c"] .sb-brand { flex: 0; }
+html[data-sb="c"] .sb-brand { flex: none; }
 html[data-sb="c"] .sb-toggle { position: absolute; top: 24px; right: -12px; width: 24px; height: 24px; background: var(--glass-solid); box-shadow: var(--glass-shadow); }
 html[data-sb="c"] .sb-toggle svg { transform: rotate(180deg); }
 html[data-sb="c"] .sb-item { width: 44px; height: 44px; padding: 0; justify-content: center; position: relative; }
 html[data-sb="c"] .sb-item .txt { display: none; }
 html[data-sb="c"] .count-pill, html[data-sb="c"] .count-red { position: absolute; top: 4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; font-size: 10px; border: 2px solid var(--glass-solid); box-sizing: content-box; }
 html[data-sb="c"] .count-pill { background: var(--ink); color: var(--on-fill); }
-html[data-sb="c"] .sb-label { height: 12px; padding: 0; }
+html[data-sb="c"] .sb .sb-label.hide-c { display: block !important; height: 1px; width: 32px; margin: 8px auto; padding: 0; font-size: 0; background: var(--glass-line); }
+html[data-sb="c"] .sb-div { display: none; }
 html[data-sb="c"] .sb-div { margin: 8px 0 0; }
 html[data-sb="c"] .sb-search-c { display: flex !important; }
 html[data-sb="c"] .user-card { background: transparent; padding: 0; justify-content: center; }
@@ -209,7 +210,7 @@ html[data-sb="c"] .sb-item:hover .tip, html[data-sb="c"] .sb-item:focus-visible 
     display: flex; position: sticky; top: 0; z-index: 30; height: calc(60px + env(safe-area-inset-top, 0px));
     padding: env(safe-area-inset-top, 0px) 16px 0; align-items: center; justify-content: space-between; background: var(--bg);
   }
-  .mtop .sb-brand { flex: 0; }
+  .mtop .sb-brand { flex: none; }
   .mtop .ava { border: 0; width: 40px; height: 40px; border-radius: 20px; }
   .mbar {
     display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center;
