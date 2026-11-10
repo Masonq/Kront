@@ -38,6 +38,7 @@ LOG=reports/deploy.log
   for u in /api/health /sr /ru /sr-cyrl /ru/usluge /ru/usluge/vodoinstalacije/vracar /ru/majstor/marko-petrovic /ru/zahtev /ru/postani-majstor /sitemap.xml; do
     printf "%s %s\n" "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${WEB_PORT}$u")" "$u"
   done
+  printf "%s POST /api/v1/search (через сайт)\n" "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${WEB_PORT}/api/v1/search?q=kran&lang=ru")"
   curl -s "http://127.0.0.1:${WEB_PORT}/ru" | grep -q "kront" && echo "-> на порту отвечает именно Kront" || echo "-> ВНИМАНИЕ: на порту отвечает не Kront"
   echo "-> снаружи по домену:"
   printf "%s http://%s/ru\n" "$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://$DOMAIN/ru")" "$DOMAIN"
