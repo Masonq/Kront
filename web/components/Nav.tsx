@@ -39,7 +39,9 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
   function toggleSb() {
     const el = document.documentElement;
     const next = el.dataset.sb === "c" ? "e" : "c";
+    el.classList.add("sb-anim");
     el.dataset.sb = next;
+    window.setTimeout(() => el.classList.remove("sb-anim"), 700);
     setCookie("kront_sb", next);
   }
   function toggleTheme() {
