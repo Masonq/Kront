@@ -1,6 +1,7 @@
 import { deepCyr, type Lang } from "./i18n";
 
 const sr = {
+  loginGoogle: "Prijavi se preko Google-a", loginErr: "Prijava nije uspela. Pokušaj ponovo.",
   login: "Prijava", loginTitle: "Prijavi se na Kront", loginSub: "Bez lozinke",
   loginTg: "Prijavi se preko Telegrama", loginTgWait: "Potvrdi u Telegramu — stranica će se sama osvežiti", loginTgOpen: "Otvori Telegram ponovo",
   loginEmail: "Ili kod na email", emailPh: "tvoj@email.com", sendCode: "Pošalji kod", codePh: "Kod iz mejla", enter: "Uđi",
@@ -33,6 +34,7 @@ const sr = {
 type D2 = typeof sr;
 
 const ru: D2 = {
+  loginGoogle: "Войти через Google", loginErr: "Не удалось войти. Попробуй ещё раз.",
   login: "Вход", loginTitle: "Войти в Kront", loginSub: "Без пароля",
   loginTg: "Войти через Telegram", loginTgWait: "Подтверди в Telegram — страница обновится сама", loginTgOpen: "Открыть Telegram ещё раз",
   loginEmail: "Или код на email", emailPh: "твой@email.com", sendCode: "Отправить код", codePh: "Код из письма", enter: "Войти",

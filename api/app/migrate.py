@@ -6,6 +6,7 @@ COLUMNS = {
     "masters": {"user_id": "INTEGER", "phone": "VARCHAR(60) DEFAULT ''", "hidden": "BOOLEAN DEFAULT FALSE"},
     "requests": {"user_id": "INTEGER", "masters": "VARCHAR(400) DEFAULT ''"},
     "reviews": {"order_id": "INTEGER", "user_id": "INTEGER"},
+    "users": {"google_sub": "VARCHAR(64)"},
 }
 
 

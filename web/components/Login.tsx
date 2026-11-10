@@ -1,12 +1,20 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Icon from "./Icon";
 import { type Lang } from "@/lib/i18n";
 import { d2 } from "@/lib/i18n2";
-import { api, refreshMe, refreshBadges, useMe } from "@/lib/me";
+import { api, refreshMe, useMe } from "@/lib/me";
 
-type Cfg = { telegram: boolean; email: boolean; bot: string };
+function GoogleG() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+    </svg>
+  );
+}
 
 export default function Login({ lang }: { lang: Lang }) {
   const t = d2(lang);
@@ -14,82 +22,26 @@ export default function Login({ lang }: { lang: Lang }) {
   const sp = useSearchParams();
   const next = sp.get("next") || `/${lang}`;
   const { me, loaded } = useMe();
-  const [cfg, setCfg] = useState<Cfg | null>(null);
-  const [tg, setTg] = useState<{ token: string; url: string } | null>(null);
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [stage, setStage] = useState<"email" | "code">("email");
-  const [err, setErr] = useState("");
-  const [busy, setBusy] = useState(false);
-  const poll = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => { api<Cfg>("/api/v1/auth/config").then(setCfg).catch(() => setCfg({ telegram: false, email: false, bot: "" })); }, []);
-  useEffect(() => () => { if (poll.current) clearInterval(poll.current); }, []);
-
-  const done = async () => { await refreshMe(); await refreshBadges(); router.replace(next); router.refresh(); };
-
-  const startTg = async () => {
-    setErr("");
-    try {
-      const r = await api<{ token: string; url: string }>("/api/v1/auth/tg/start", { method: "POST" });
-      setTg(r);
-      window.open(r.url, "_blank", "noopener");
-      if (poll.current) clearInterval(poll.current);
-      poll.current = setInterval(async () => {
-        try {
-          const c = await api<{ ok: boolean }>(`/api/v1/auth/tg/check?token=${r.token}`, { method: "POST" });
-          if (c.ok) { clearInterval(poll.current!); done(); }
-        } catch { clearInterval(poll.current!); setTg(null); setErr(t.err); }
-      }, 2000);
-    } catch { setErr(t.err); }
-  };
-
-  const sendCode = async (e: React.FormEvent) => {
-    e.preventDefault(); setErr(""); setBusy(true);
-    try { await api("/api/v1/auth/email/start", { body: { email } }); setStage("code"); } catch { setErr(t.err); }
-    setBusy(false);
-  };
-  const verify = async (e: React.FormEvent) => {
-    e.preventDefault(); setErr(""); setBusy(true);
-    try { await api("/api/v1/auth/email/verify", { body: { email, code } }); await done(); } catch { setErr(t.wrongCode); }
-    setBusy(false);
-  };
+  const [google, setGoogle] = useState<boolean | null>(null);
+  useEffect(() => { api<{ google: boolean }>("/api/v1/auth/config").then((c) => setGoogle(c.google)).catch(() => setGoogle(false)); }, []);
   const logout = async () => { await api("/api/v1/auth/logout", { method: "POST" }).catch(() => {}); await refreshMe(); router.refresh(); };
 
   return (
     <>
       <section className="nhero short">
         <img src="/sec/brave-i-sigurnost.jpg" alt="" />
-        <div className="nhero-in"><h1>{me ? me.name : t.loginTitle}</h1><span className="role">{t.loginSub}</span></div>
+        <div className="nhero-in"><h1>{me ? me.name : t.loginTitle}</h1><span className="role">{me ? (me.email || "") : t.loginSub}</span></div>
       </section>
       <div className="sheet narrow">
-        {!loaded || !cfg ? <div className="skeleton-line" /> : me ? (
-          <div className="form">
-            <p className="muted" style={{ margin: 0 }}>{me.email || (me.tg ? "@" + me.tg : "")}</p>
-            <div className="form-actions"><span /><button type="button" className="btn ghost" onClick={logout}>{t.logout}</button></div>
-          </div>
+        {!loaded || google === null ? <div className="skeleton-line" /> : me ? (
+          <div className="form-actions"><span /><button type="button" className="btn ghost" onClick={logout}>{t.logout}</button></div>
         ) : (
           <div className="form">
             <p className="muted" style={{ margin: 0 }}>{t.loginNeed}</p>
-            {cfg.telegram && (
-              <>
-                <button type="button" className="btn lg tg" onClick={startTg}><Icon name="send" size={20} />{t.loginTg}</button>
-                {tg && <p className="hint">{t.loginTgWait} · <a href={tg.url} target="_blank" rel="noopener">{t.loginTgOpen}</a></p>}
-              </>
-            )}
-            {cfg.email && (stage === "email" ? (
-              <form className="form" onSubmit={sendCode}>
-                <label>{t.loginEmail}<input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.emailPh} autoComplete="email" /></label>
-                <button type="submit" className="btn" disabled={busy}>{t.sendCode}</button>
-              </form>
-            ) : (
-              <form className="form" onSubmit={verify}>
-                <label>{t.codePh}<input className="input" inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} autoComplete="one-time-code" /></label>
-                <button type="submit" className="btn" disabled={busy || code.length !== 6}>{t.enter}</button>
-              </form>
-            ))}
-            {!cfg.telegram && !cfg.email && <p className="hint">{t.loginNone}</p>}
-            {err && <span className="err">{err}</span>}
+            {google ? (
+              <a href={`/api/v1/auth/google/start?next=${encodeURIComponent(next)}`} className="btn lg google"><GoogleG />{t.loginGoogle}</a>
+            ) : <p className="hint">{t.loginNone}</p>}
+            {sp.get("error") && <span className="err">{t.loginErr}</span>}
           </div>
         )}
       </div>

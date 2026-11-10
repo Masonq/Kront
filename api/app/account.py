@@ -14,7 +14,7 @@ from email.message import EmailMessage
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select, func, or_, delete
 from sqlalchemy.orm import Session
@@ -30,6 +30,8 @@ TG_TOKEN = os.getenv("TG_BOT_TOKEN", "").strip()
 TG_NAME = os.getenv("TG_BOT_NAME", "").strip().lstrip("@")
 SITE = os.getenv("SITE_URL", "")
 SMTP = {k: os.getenv(f"SMTP_{k}", "") for k in ("HOST", "PORT", "USER", "PASS", "FROM")}
+GOOGLE_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+GOOGLE_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
 ADMINS = {x.strip() for x in os.getenv("ADMIN_TG_IDS", "").split(",") if x.strip()}
 
 
@@ -61,7 +63,7 @@ def start_session(db: Session, resp: Response, request: Request, user: m.User):
     tok = secrets.token_urlsafe(32)
     db.add(m.Session(token=tok, user_id=user.id, expires_at=datetime.utcnow() + timedelta(days=90)))
     db.commit()
-    secure = request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
+    secure = SITE.startswith("https://") or request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
     resp.set_cookie(COOKIE, tok, max_age=90 * 86400, httponly=True, samesite="lax", secure=secure, path="/")
 
 
@@ -84,7 +86,67 @@ def user_out(db: Session, u: m.User):
 
 @router.get("/auth/config")
 def auth_config():
-    return {"telegram": bool(TG_TOKEN and TG_NAME), "email": bool(SMTP["HOST"]), "bot": TG_NAME}
+    return {"google": bool(GOOGLE_ID and GOOGLE_SECRET)}
+
+
+# ---------------- вход через Google (OAuth 2.0, код авторизации) ----------------
+
+def _safe_next(n: str) -> str:
+    return n if n.startswith("/") and not n.startswith("//") else "/"
+
+
+@router.get("/auth/google/start")
+def google_start(next: str = "/"):
+    if not (GOOGLE_ID and GOOGLE_SECRET and SITE):
+        raise HTTPException(503, "google")
+    state = secrets.token_urlsafe(24)
+    q = urllib.parse.urlencode({"client_id": GOOGLE_ID, "redirect_uri": f"{SITE}/api/v1/auth/google/callback", "response_type": "code",
+                                "scope": "openid email profile", "state": state, "prompt": "select_account"})
+    resp = RedirectResponse(f"https://accounts.google.com/o/oauth2/v2/auth?{q}", status_code=302)
+    sec = SITE.startswith("https://")
+    resp.set_cookie("kront_g", state, max_age=600, httponly=True, samesite="lax", secure=sec, path="/")
+    resp.set_cookie("kront_gn", urllib.parse.quote(_safe_next(next), safe=""), max_age=600, httponly=True, samesite="lax", secure=sec, path="/")
+    return resp
+
+
+@router.get("/auth/google/callback")
+def google_callback(request: Request, code: str = "", state: str = "", error: str = "", db: Session = Depends(get_db)):
+    st = request.cookies.get("kront_g", "")
+    nxt = _safe_next(urllib.parse.unquote(request.cookies.get("kront_gn", "")) or "/")
+    seg = nxt.split("/")[1] if nxt.count("/") >= 1 else ""
+    fail = RedirectResponse(f"/{seg if seg in ('sr', 'sr-cyrl', 'ru') else 'sr'}/vhod?error=google", status_code=302)
+    if error or not code or not st or not secrets.compare_digest(st, state):
+        return fail
+    try:
+        data = urllib.parse.urlencode({"code": code, "client_id": GOOGLE_ID, "client_secret": GOOGLE_SECRET,
+                                       "redirect_uri": f"{SITE}/api/v1/auth/google/callback", "grant_type": "authorization_code"}).encode()
+        with urllib.request.urlopen(urllib.request.Request("https://oauth2.googleapis.com/token", data=data), timeout=15) as r:
+            tok = json.load(r)
+        with urllib.request.urlopen(f"https://oauth2.googleapis.com/tokeninfo?id_token={urllib.parse.quote(tok['id_token'])}", timeout=15) as r:
+            info = json.load(r)
+    except Exception:
+        return fail
+    if info.get("aud") != GOOGLE_ID or info.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
+        return fail
+    sub, email = info.get("sub"), (info.get("email") or "").lower()
+    u = db.scalar(select(m.User).where(m.User.google_sub == sub))
+    if not u and email and info.get("email_verified") in (True, "true"):
+        u = db.scalar(select(m.User).where(m.User.email == email))
+    if not u:
+        u = m.User(google_sub=sub, email=email or None, name=info.get("name") or email.split("@")[0], photo=info.get("picture", ""))
+        db.add(u)
+        db.flush()
+        make_admin_if_first(db, u)
+    else:
+        u.google_sub = sub
+        u.photo = u.photo or info.get("picture", "")
+        u.name = u.name or info.get("name", "")
+    db.commit()
+    resp = RedirectResponse(nxt, status_code=302)
+    resp.delete_cookie("kront_g", path="/")
+    resp.delete_cookie("kront_gn", path="/")
+    start_session(db, resp, request, u)
+    return resp
 
 
 @router.get("/me")

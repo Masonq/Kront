@@ -695,3 +695,5 @@ html[data-sb="c"] .sb .user-card .round-btn { display: none !important; }
 .kpis > div { min-width: 0; }
 .kpis b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpis b.sm { font: 600 16px/1.5 var(--font); padding-top: 4px; }
+.btn.google { background: #fff; color: #1F1F1F; border: 1px solid #DADCE0; box-shadow: none; gap: 12px; font-weight: 500; }
+.btn.google:hover { background: #F8F9FA; opacity: 1; }

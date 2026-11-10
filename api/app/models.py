@@ -146,6 +146,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str | None] = mapped_column(String(200), unique=True, index=True)
     tg_id: Mapped[int | None] = mapped_column(Integer, unique=True, index=True)
+    google_sub: Mapped[str | None] = mapped_column(String(64), unique=True, index=True, nullable=True)
     tg_username: Mapped[str] = mapped_column(String(80), default="")
     name: Mapped[str] = mapped_column(String(120), default="")
     photo: Mapped[str] = mapped_column(String(255), default="")
