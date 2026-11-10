@@ -570,7 +570,9 @@ html[data-sb="c"]:not(.sb-opening) .pickbar { left: calc(50% + (var(--sb-w-c) + 
 html[data-sb="c"]:not(.sb-opening) .sb .sb-brand .nut { transform: rotate(-360deg); }
 .sb-toggle svg { transition: transform var(--sb-dur) var(--sb-ease); }
 /* закрытие: подписи гаснут, потом панель сужается; открытие: панель расширяется, потом подписи проявляются */
-html.sb-closing .sb .hide-c, html.sb-closing .sb .txt, html.sb-closing .sb .sb-foot, html.sb-closing .sb .sb-div { opacity: 0; transition: opacity .14s ease; }
+html.sb-closing .sb .hide-c, html.sb-closing .sb .txt, html.sb-closing .sb .sb-foot, html.sb-closing .sb .sb-div, html.sb-closing .sb .sb-toggle { opacity: 0; transition: opacity .14s ease; }
+/* после сворачивания: элементы узкого вида (поиск-иконка, черты групп, низ, кнопка «›») проявляются, когда панель уже сужается */
+html.sb-settle .sb .sb-search-c, html.sb-settle .sb .sb-label, html.sb-settle .sb .sb-foot, html.sb-settle .sb .sb-toggle { animation: sb-fade .3s ease .18s both; }
 html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, html.sb-reveal .sb .sb-foot, html.sb-reveal .sb .sb-div { animation: sb-fade .28s ease both; }
 @keyframes sb-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 899px) {
@@ -579,7 +581,7 @@ html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, html.sb-reveal .sb .sb-foot
 @keyframes nut-turn { from { transform: rotate(-360deg); } to { transform: rotate(0deg); } }
 @media (prefers-reduced-motion: reduce) {
   .sb, .content, .sb .sb-brand .nut, .sb-toggle svg { transition: none; }
-  html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, .sb.open .sb-brand .nut { animation: none; }
+  html.sb-reveal .sb .hide-c, html.sb-reveal .sb .txt, html.sb-settle .sb *, .sb.open .sb-brand .nut { animation: none; }
 }
 .sb-item { transition: width .3s var(--sb-ease), background-color .15s ease; }
 @media (prefers-reduced-motion: reduce) { .sb-item { transition: none; } }

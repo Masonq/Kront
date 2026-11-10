@@ -39,7 +39,7 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
   function toggleSb() {
     const el = document.documentElement;
     const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (el.classList.contains("sb-opening") || el.classList.contains("sb-closing")) return;
+    if (["sb-opening", "sb-closing", "sb-settle", "sb-reveal"].some((c) => el.classList.contains(c))) return;
     if (el.dataset.sb === "c") {
       setCookie("kront_sb", "e");
       if (calm) { el.dataset.sb = "e"; return; }
@@ -56,7 +56,12 @@ export default function Nav({ lang, sections }: { lang: Lang; sections: Section[
       if (calm) { el.dataset.sb = "c"; return; }
       // 1) подписи гаснут → 2) панель сужается, гайка делает оборот в обратную сторону
       el.classList.add("sb-closing");
-      window.setTimeout(() => { el.dataset.sb = "c"; el.classList.remove("sb-closing"); }, 140);
+      window.setTimeout(() => {
+        el.classList.add("sb-settle");
+        el.dataset.sb = "c";
+        el.classList.remove("sb-closing");
+        window.setTimeout(() => el.classList.remove("sb-settle"), 520);
+      }, 140);
     }
   }
   function toggleTheme() {
