@@ -1,330 +1,171 @@
-=== deploy 2026-11-10T11:18:28Z ===
--> создан .env с паролем БД
+=== deploy 2026-11-10T11:35:39Z ===
 warning: redirecting to https://github.com/Masonq/Kront.git/
 Already up to date.
- Image kront-api Building 
  Image kront-web Building 
+ Image kront-api Building 
 #1 [internal] load local bake definitions
 #1 reading from stdin 841B done
 #1 DONE 0.0s
 
 #2 [web internal] load build definition from Dockerfile
 #2 transferring dockerfile: 584B done
-#2 DONE 0.1s
+#2 DONE 0.0s
 
 #3 [api internal] load build definition from Dockerfile
 #3 transferring dockerfile: 315B done
-#3 DONE 0.1s
+#3 DONE 0.0s
 
-#4 [web internal] load metadata for docker.io/library/node:22-alpine
+#4 [api internal] load metadata for docker.io/library/python:3.12-slim
 #4 ...
 
-#5 [api internal] load metadata for docker.io/library/python:3.12-slim
-#5 DONE 0.7s
+#5 [web internal] load metadata for docker.io/library/node:22-alpine
+#5 DONE 0.4s
+
+#4 [api internal] load metadata for docker.io/library/python:3.12-slim
+#4 DONE 0.4s
 
 #6 [api internal] load .dockerignore
 #6 transferring context: 2B done
 #6 DONE 0.0s
 
-#7 [api internal] load build context
-#7 transferring context: 39.52kB done
+#7 [web internal] load .dockerignore
+#7 transferring context: 59B done
 #7 DONE 0.0s
 
-#8 [api 1/5] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
-#8 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
+#8 [api internal] load build context
+#8 transferring context: 253B done
 #8 DONE 0.0s
 
-#9 [api 2/5] WORKDIR /app
-#9 CACHED
+#9 [web deps 1/4] FROM docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202
+#9 resolve docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202 0.0s done
+#9 DONE 0.0s
 
-#10 [api 3/5] COPY requirements.txt .
+#10 [api 1/5] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#10 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
 #10 DONE 0.0s
 
-#4 [web internal] load metadata for docker.io/library/node:22-alpine
-#4 DONE 1.4s
+#11 [api 2/5] WORKDIR /app
+#11 CACHED
 
-#11 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
-#11 ...
+#12 [api 3/5] COPY requirements.txt .
+#12 CACHED
 
-#12 [web internal] load .dockerignore
-#12 transferring context: 59B done
-#12 DONE 0.0s
+#13 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
+#13 CACHED
 
-#13 [web internal] load build context
-#13 transferring context: 953.14kB 0.0s done
-#13 DONE 0.1s
+#14 [api 5/5] COPY app ./app
+#14 CACHED
 
-#14 [web deps 1/4] FROM docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202
-#14 resolve docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202 0.0s done
-#14 sha256:071409a402546fea9e56af710d951a9e0c9bb205e4b1186811677d2c9dcad115 443B / 443B 0.1s done
-#14 sha256:881fc932939efef04ca120ad44bbd2c0917851eb247aa4995428afb1e80ede17 0B / 3.85MB 0.2s
-#14 sha256:df11f9b3da94f640e357ccc86df09a574dc04df1ad95e012f511f4a02b566cd3 0B / 1.26MB 0.3s
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 0B / 56.22MB 0.2s
-#14 sha256:881fc932939efef04ca120ad44bbd2c0917851eb247aa4995428afb1e80ede17 3.85MB / 3.85MB 0.4s done
-#14 extracting sha256:881fc932939efef04ca120ad44bbd2c0917851eb247aa4995428afb1e80ede17
-#14 sha256:df11f9b3da94f640e357ccc86df09a574dc04df1ad95e012f511f4a02b566cd3 1.26MB / 1.26MB 0.5s done
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 6.29MB / 56.22MB 0.5s
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 12.92MB / 56.22MB 0.6s
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 24.12MB / 56.22MB 0.8s
-#14 extracting sha256:881fc932939efef04ca120ad44bbd2c0917851eb247aa4995428afb1e80ede17 0.5s done
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 47.19MB / 56.22MB 1.1s
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 56.22MB / 56.22MB 1.2s
-#14 sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 56.22MB / 56.22MB 1.3s done
-#14 extracting sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c
-#14 extracting sha256:2a9491572f6e8f9c3be47a2d17b7dcd30f264003f2cbeedf9359544b3ca5396c 2.9s done
-#14 DONE 4.3s
+#15 [web internal] load build context
+#15 transferring context: 3.68kB 0.0s done
+#15 DONE 0.0s
 
-#11 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
-#11 3.144 Collecting fastapi==0.115.6 (from -r requirements.txt (line 1))
-#11 3.283   Downloading fastapi-0.115.6-py3-none-any.whl.metadata (27 kB)
-#11 3.369 Collecting uvicorn==0.32.1 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 3.385   Downloading uvicorn-0.32.1-py3-none-any.whl.metadata (6.6 kB)
-#11 4.308 Collecting SQLAlchemy==2.0.36 (from -r requirements.txt (line 3))
-#11 4.321   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.7 kB)
-#11 4.385 Collecting psycopg==3.2.3 (from psycopg[binary]==3.2.3->-r requirements.txt (line 4))
-#11 4.399   Downloading psycopg-3.2.3-py3-none-any.whl.metadata (4.3 kB)
-#11 4.731 Collecting pydantic==2.10.3 (from -r requirements.txt (line 5))
-#11 4.744   Downloading pydantic-2.10.3-py3-none-any.whl.metadata (172 kB)
-#11 4.871 Collecting starlette<0.42.0,>=0.40.0 (from fastapi==0.115.6->-r requirements.txt (line 1))
-#11 4.881   Downloading starlette-0.41.3-py3-none-any.whl.metadata (6.0 kB)
-#11 ...
+#16 [web build 4/5] COPY . .
+#16 CACHED
 
-#14 [web deps 1/4] FROM docker.io/library/node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202
-#14 extracting sha256:df11f9b3da94f640e357ccc86df09a574dc04df1ad95e012f511f4a02b566cd3 0.1s done
-#14 extracting sha256:071409a402546fea9e56af710d951a9e0c9bb205e4b1186811677d2c9dcad115 0.0s done
-#14 DONE 4.4s
+#17 [web stage-2 3/5] COPY --from=build /app/.next/standalone ./
+#17 CACHED
 
-#11 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
-#11 5.001 Collecting typing-extensions>=4.8.0 (from fastapi==0.115.6->-r requirements.txt (line 1))
-#11 5.015   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
-#11 5.071 Collecting click>=7.0 (from uvicorn==0.32.1->uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 5.083   Downloading click-8.5.1-py3-none-any.whl.metadata (2.6 kB)
-#11 ...
+#18 [web deps 2/4] WORKDIR /app
+#18 CACHED
 
-#15 [web deps 2/4] WORKDIR /app
-#15 DONE 0.2s
+#19 [web deps 4/4] RUN npm ci --no-audit --no-fund
+#19 CACHED
 
-#11 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
-#11 5.125 Collecting h11>=0.8 (from uvicorn==0.32.1->uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 5.141   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
-#11 ...
-
-#16 [web deps 3/4] COPY package.json package-lock.json ./
-#16 DONE 0.0s
-
-#17 [web deps 4/4] RUN npm ci --no-audit --no-fund
-#17 ...
-
-#11 [api 4/5] RUN pip install --no-cache-dir -r requirements.txt
-#11 5.630 Collecting greenlet!=0.4.17 (from SQLAlchemy==2.0.36->-r requirements.txt (line 3))
-#11 5.645   Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
-#11 5.686 Collecting annotated-types>=0.6.0 (from pydantic==2.10.3->-r requirements.txt (line 5))
-#11 5.698   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
-#11 7.611 Collecting pydantic-core==2.27.1 (from pydantic==2.10.3->-r requirements.txt (line 5))
-#11 7.627   Downloading pydantic_core-2.27.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
-#11 8.666 Collecting psycopg-binary==3.2.3 (from psycopg[binary]==3.2.3->-r requirements.txt (line 4))
-#11 8.678   Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.8 kB)
-#11 8.929 Collecting httptools>=0.6.3 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 8.944   Downloading httptools-0.9.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
-#11 9.314 Collecting python-dotenv>=0.13 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 9.331   Downloading python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
-#11 9.714 Collecting pyyaml>=5.1 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 9.727   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
-#11 9.985 Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 10.00   Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.1 kB)
-#11 10.31 Collecting watchfiles>=0.13 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 10.32   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
-#11 10.77 Collecting websockets>=10.4 (from uvicorn[standard]==0.32.1->-r requirements.txt (line 2))
-#11 10.78   Downloading websockets-17.4-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.3 kB)
-#11 10.86 Collecting anyio<5,>=3.4.0 (from starlette<0.42.0,>=0.40.0->fastapi==0.115.6->-r requirements.txt (line 1))
-#11 10.87   Downloading anyio-4.16.0-py3-none-any.whl.metadata (4.7 kB)
-#11 10.93 Collecting idna>=2.8 (from anyio<5,>=3.4.0->starlette<0.42.0,>=0.40.0->fastapi==0.115.6->-r requirements.txt (line 1))
-#11 10.94   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
-#11 10.96 Downloading fastapi-0.115.6-py3-none-any.whl (94 kB)
-#11 10.98 Downloading uvicorn-0.32.1-py3-none-any.whl (63 kB)
-#11 11.00 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
-#11 11.15    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 20.9 MB/s eta 0:00:00
-#11 11.17 Downloading psycopg-3.2.3-py3-none-any.whl (197 kB)
-#11 11.18 Downloading pydantic-2.10.3-py3-none-any.whl (456 kB)
-#11 11.23 Downloading psycopg_binary-3.2.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.2 MB)
-#11 11.42    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 21.7 MB/s eta 0:00:00
-#11 11.44 Downloading pydantic_core-2.27.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
-#11 11.56    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 19.3 MB/s eta 0:00:00
-#11 11.57 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
-#11 11.59 Downloading click-8.5.1-py3-none-any.whl (126 kB)
-#11 11.61 Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (621 kB)
-#11 11.64    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 621.4/621.4 kB 20.9 MB/s eta 0:00:00
-#11 11.65 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
-#11 11.66 Downloading httptools-0.9.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (552 kB)
-#11 11.69    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 552.8/552.8 kB 23.2 MB/s eta 0:00:00
-#11 11.71 Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
-#11 11.72 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
-#11 11.76    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 19.3 MB/s eta 0:00:00
-#11 11.77 Downloading starlette-0.41.3-py3-none-any.whl (73 kB)
-#11 11.79 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
-#11 11.80 Downloading uvloop-0.23.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.5 MB)
-#11 12.02    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 20.6 MB/s eta 0:00:00
-#11 12.04 Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (458 kB)
-#11 12.06 Downloading websockets-17.4-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (226 kB)
-#11 12.08 Downloading anyio-4.16.0-py3-none-any.whl (134 kB)
-#11 12.09 Downloading idna-3.20-py3-none-any.whl (69 kB)
-#11 12.21 Installing collected packages: websockets, uvloop, typing-extensions, pyyaml, python-dotenv, psycopg-binary, idna, httptools, h11, greenlet, click, annotated-types, uvicorn, SQLAlchemy, pydantic-core, psycopg, anyio, watchfiles, starlette, pydantic, fastapi
-#11 16.00 Successfully installed SQLAlchemy-2.0.36 annotated-types-0.8.0 anyio-4.16.0 click-8.5.1 fastapi-0.115.6 greenlet-3.5.6 h11-0.16.0 httptools-0.9.0 idna-3.20 psycopg-3.2.3 psycopg-binary-3.2.3 pydantic-2.10.3 pydantic-core-2.27.1 python-dotenv-1.2.4 pyyaml-6.0.3 starlette-0.41.3 typing-extensions-4.16.0 uvicorn-0.32.1 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.4
-#11 16.00 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
-#11 16.13 
-#11 16.13 [notice] A new release of pip is available: 25.0.1 -> 26.3
-#11 16.13 [notice] To update, run: pip install --upgrade pip
-#11 DONE 16.8s
-
-#17 [web deps 4/4] RUN npm ci --no-audit --no-fund
-#17 ...
-
-#18 [api 5/5] COPY app ./app
-#18 DONE 0.1s
-
-#19 [api] exporting to image
-#19 exporting layers
-#19 exporting layers 5.0s done
-#19 ...
-
-#17 [web deps 4/4] RUN npm ci --no-audit --no-fund
-#17 15.82 npm warn deprecated next@15.1.6: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
-#17 16.12 
-#17 16.12 added 38 packages in 16s
-#17 16.12 npm notice
-#17 16.12 npm notice New major version of npm available! 10.9.9 -> 12.2.2
-#17 16.12 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
-#17 16.12 npm notice To update run: npm install -g npm@12.2.2
-#17 16.12 npm notice
-#17 DONE 16.6s
-
-#19 [api] exporting to image
-#19 exporting manifest sha256:b463c2eadc61e63a3eb42239df8ddbcd5ef07504c287d146808b0cfa11303528 0.0s done
-#19 exporting config sha256:21efd056552ef58305d4c656adfb0042bb126329fcf7766832b2d54e1670b245 0.0s done
-#19 exporting attestation manifest sha256:657b089487d36f9dcbb48da60955a2bb50569712a18caaff94bf9cec14c7999d 0.0s done
-#19 exporting manifest list sha256:deef8907471e0cdd1f1dd6ea2be7bc5881023ee783f3f4563ecc9d7c3a033194 done
-#19 naming to docker.io/library/kront-api:latest done
-#19 unpacking to docker.io/library/kront-api:latest
-#19 unpacking to docker.io/library/kront-api:latest 2.0s done
-#19 DONE 7.1s
-
-#20 [api] resolving provenance for metadata file
-#20 DONE 0.0s
+#20 [web deps 3/4] COPY package.json package-lock.json ./
+#20 CACHED
 
 #21 [web build 3/5] COPY --from=deps /app/node_modules ./node_modules
-#21 DONE 2.6s
+#21 CACHED
 
-#22 [web build 4/5] COPY . .
-#22 DONE 0.1s
+#22 [web build 5/5] RUN npx next build
+#22 CACHED
 
-#23 [web build 5/5] RUN npx next build
-#23 2.015    ▲ Next.js 15.1.6
-#23 2.015 
-#23 2.076    Creating an optimized production build ...
-#23 25.42  ✓ Compiled successfully
-#23 25.42    Linting and checking validity of types ...
-#23 33.20    Collecting page data ...
-#23 37.98    Generating static pages (0/4) ...
-#23 39.23    Generating static pages (1/4) 
-#23 39.23    Generating static pages (2/4) 
-#23 39.23    Generating static pages (3/4) 
-#23 39.23  ✓ Generating static pages (4/4)
-#23 39.84    Finalizing page optimization ...
-#23 39.84    Collecting build traces ...
-#23 59.79 
-#23 59.80 Route (app)                              Size     First Load JS
-#23 59.80 ┌ ○ /_not-found                          979 B           106 kB
-#23 59.80 ├ ƒ /[lang]                              186 B           117 kB
-#23 59.80 ├ ƒ /[lang]/majstor/[slug]               172 B           109 kB
-#23 59.80 ├ ƒ /[lang]/omiljeni                     183 B           109 kB
-#23 59.80 ├ ƒ /[lang]/poruke                       183 B           109 kB
-#23 59.80 ├ ƒ /[lang]/postani-majstor              183 B           109 kB
-#23 59.80 ├ ƒ /[lang]/usluge                       183 B           109 kB
-#23 59.80 ├ ƒ /[lang]/usluge/[slug]                555 B           110 kB
-#23 59.80 ├ ƒ /[lang]/usluge/[slug]/[district]     555 B           110 kB
-#23 59.80 ├ ƒ /[lang]/zahtev                       8.31 kB         117 kB
-#23 59.80 ├ ƒ /[lang]/zahtevi                      183 B           109 kB
-#23 59.80 ├ ○ /robots.txt                          0 B                0 B
-#23 59.80 └ ƒ /sitemap.xml                         0 B                0 B
-#23 59.80 + First Load JS shared by all            105 kB
-#23 59.80   ├ chunks/4bd1b696-1aaacd546f10f1e9.js  52.9 kB
-#23 59.80   ├ chunks/517-05645e1cf68b89a5.js       50.5 kB
-#23 59.80   └ other shared chunks (total)          1.91 kB
-#23 59.80 
-#23 59.80 
-#23 59.80 ƒ Middleware                             32.1 kB
-#23 59.80 
-#23 59.80 ○  (Static)   prerendered as static content
-#23 59.80 ƒ  (Dynamic)  server-rendered on demand
-#23 59.80 
-#23 59.89 npm notice
-#23 59.89 npm notice New major version of npm available! 10.9.9 -> 12.2.2
-#23 59.89 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
-#23 59.89 npm notice To update run: npm install -g npm@12.2.2
-#23 59.89 npm notice
-#23 DONE 60.0s
+#23 [web stage-2 4/5] COPY --from=build /app/.next/static ./.next/static
+#23 CACHED
 
-#24 [web stage-2 3/5] COPY --from=build /app/.next/standalone ./
-#24 DONE 1.4s
+#24 [web stage-2 5/5] COPY --from=build /app/public ./public
+#24 CACHED
 
-#25 [web stage-2 4/5] COPY --from=build /app/.next/static ./.next/static
+#25 [web] exporting to image
+#25 exporting layers done
+#25 exporting manifest sha256:a0e0b5ceb30d916b8990731e429e287d2c53594c4cf3049fa186057263fd4dbf done
+#25 exporting config sha256:8decc1181baafc392c10913dc9b9e1b2ddbe888a0aa824dca605547921b27085
+#25 ...
+
+#26 [api] exporting to image
+#26 exporting layers done
+#26 exporting manifest sha256:78caebb19ee92f7b58e2f5d3af6a671bd3e2a40394dc3e6361a5be01d54e3263 done
+#26 exporting config sha256:ef55ea5d5cf4c56d141d6e92273c8aac08f541d8cc65aa8017eb7e01e274cc3b done
+#26 exporting attestation manifest sha256:1c8981e6cc3f4e1c8852b15a653b92c63a9d80c0627d5c86eae660548f441f88 0.0s done
+#26 exporting manifest list sha256:51057e729add3d872461663b9b1d31806e6e18181af48bbed0534f1f609b1f20 done
+#26 naming to docker.io/library/kront-api:latest done
+#26 unpacking to docker.io/library/kront-api:latest 0.0s done
+#26 DONE 0.2s
+
+#25 [web] exporting to image
+#25 exporting config sha256:8decc1181baafc392c10913dc9b9e1b2ddbe888a0aa824dca605547921b27085 done
+#25 exporting attestation manifest sha256:9d20cca0608f9996a9a418ba70de925f28c54b784f5745f9817a23e4921638f0 0.0s done
+#25 exporting manifest list sha256:16f0c7221a3ea97daf4745b361a0c952007cf9865a3c5f8947be14fa3cb8e10c 0.0s done
+#25 naming to docker.io/library/kront-web:latest done
+#25 unpacking to docker.io/library/kront-web:latest 0.0s done
 #25 DONE 0.2s
 
-#26 [web stage-2 5/5] COPY --from=build /app/public ./public
-#26 DONE 0.0s
-
-#27 [web] exporting to image
-#27 exporting layers
-#27 exporting layers 2.6s done
-#27 exporting manifest sha256:a8f3b330351d6fb6bbec0c77572077657d804cd8f30a027a7f22ae2d8c0887ea 0.0s done
-#27 exporting config sha256:cc96e5c638556c618adc00cc7414ad625a2606b92cff3a06de0acc872a27d380 done
-#27 exporting attestation manifest sha256:c125e4cef6d01cae9a8f1039a167805472a77673818037b44d1442fe97d5643d done
-#27 exporting manifest list sha256:911201eed7296799b4495a97d0bac596b6fd4f6292f8e495aa97f62c82f430e0 done
-#27 naming to docker.io/library/kront-web:latest done
-#27 unpacking to docker.io/library/kront-web:latest
-#27 unpacking to docker.io/library/kront-web:latest 0.8s done
-#27 DONE 3.5s
+#27 [api] resolving provenance for metadata file
+#27 DONE 0.0s
 
 #28 [web] resolving provenance for metadata file
 #28 DONE 0.0s
  Image kront-api Built 
  Image kront-web Built 
- Network kront_default Creating 
- Volume kront_dbdata Creating 
- Volume kront_dbdata Creating 
- Network kront_default Creating 
- Volume kront_dbdata Created 
- Volume kront_dbdata Created 
- Network kront_default Created 
- Network kront_default Created 
- Container kront-db-1 Creating 
- Container kront-db-1 Created 
- Container kront-api-1 Creating 
- Container kront-api-1 Created 
- Container kront-web-1 Creating 
- Container kront-web-1 Created 
- Container kront-db-1 Starting 
- Container kront-db-1 Started 
+ Container kront-db-1 Running 
+ Container kront-api-1 Running 
+ Container kront-web-1 Recreate 
+ Container kront-web-1 Recreated 
  Container kront-db-1 Waiting 
  Container kront-db-1 Healthy 
- Container kront-api-1 Starting 
- Container kront-api-1 Started 
  Container kront-web-1 Starting 
-Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint kront-web-1 (e5db2af37270d06dfe06508c517bcacc8f99a2500c1224699115b18155fd48ce): Bind for 127.0.0.1:8095 failed: port is already allocated
+ Container kront-web-1 Started 
+-> домен: kront.89-208-113-147.sslip.io -> 127.0.0.1:8120
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -> контейнеры:
 SERVICE   STATE     STATUS
-api       running   Up 9 seconds
-db        running   Up 14 seconds (healthy)
+api       running   Up About a minute
+db        running   Up 16 minutes (healthy)
+web       running   Up 24 seconds
 -> проверки:
-200 /api/health
+-> порт сайта: 8120
+500 /api/health
 200 /sr
 200 /ru
 200 /sr-cyrl
+200 /ru/usluge
 200 /ru/usluge/vodoinstalacije/vracar
 200 /ru/majstor/marko-petrovic
+200 /ru/zahtev
+200 /ru/postani-majstor
 200 /sitemap.xml
+-> на порту отвечает именно Kront
+-> снаружи по домену:
+301 http://kront.89-208-113-147.sslip.io/ru
+200 https://kront.89-208-113-147.sslip.io/ru
 -> последние логи api:
-api-1  | INFO:     Started server process [1]
-api-1  | INFO:     Waiting for application startup.
-api-1  | INFO:     Application startup complete.
-api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1  | INFO:     172.21.0.4:49270 - "GET /api/v1/districts?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:49268 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar&sort=recommended HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:49270 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:49268 - "GET /api/v1/masters/marko-petrovic?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:49268 - "GET /api/v1/sitemap?lang=sr HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/catalog?lang=sr HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/masters?lang=sr&limit=8 HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/masters?lang=ru&limit=8 HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/catalog?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/category/vodoinstalacije?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/districts?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar&sort=recommended HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45348 - "GET /api/v1/masters?lang=ru&service=vodoinstalacije&district=vracar HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/masters/marko-petrovic?lang=ru HTTP/1.1" 200 OK
+api-1  | INFO:     172.21.0.4:45334 - "GET /api/v1/sitemap?lang=sr HTTP/1.1" 200 OK
