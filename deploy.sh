@@ -34,4 +34,8 @@ LOG=reports/deploy.log
   echo "-> последние логи api:"; docker compose logs --tail=15 api 2>&1 | tail -15
 } > "$LOG" 2>&1
 cat "$LOG" | tail -25
-git add "$LOG" && git -c user.name="kront-server" -c user.email="server@kront" commit -qm "deploy report $(date -u +%F_%H%M)" && git push -q || echo "(отчёт не отправлен в git — нет прав на push с сервера)"
+git add "$LOG" && git -c user.name="kront-server" -c user.email="server@kront" commit -qm "deploy report $(date -u +%F_%H%M)" || true
+for i in 1 2 3; do
+  git -c user.name="kront-server" -c user.email="server@kront" pull -q --rebase origin main && git push -q origin HEAD:main && break
+  sleep 3
+done || echo "(отчёт не отправлен в git)"
