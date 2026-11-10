@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Icon from "@/components/Icon";
 import { Ava } from "@/components/MasterCard";
+import FavButton from "@/components/Fav";
 import { api, fmtPrice, SITE } from "@/lib/api";
 import { dict, isLang, tx, type Lang } from "@/lib/i18n";
 import { alternates } from "@/lib/seo";
@@ -51,7 +52,7 @@ export default async function Page({ params }: P) {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Link href={`/${lang}/usluge/${m.service_list[0]?.slug || ""}`} className="glass-btn" aria-label={t.back}><Icon name="left" size={18} stroke={2.2} /></Link>
               {m.demo && <span className="demo-tag" style={{ background: "rgba(255,255,255,.16)", color: "#fff" }}>{t.demo}</span>}
-              <button type="button" className="glass-btn" aria-label={t.favorite}><Icon name="heart" size={18} /></button>
+              <FavButton slug={m.slug} label={t.favorite} className="glass-btn" />
             </div>
             <div className="p-title">
               <h1>{name}</h1>

@@ -108,8 +108,12 @@ def category(slug: str, lang: str = "sr", db: Session = Depends(get_db)):
 @app.get("/api/v1/masters")
 def masters(lang: str = "sr", service: str | None = None, district: str | None = None, verified: bool = False,
             speaks: str | None = None, online: bool = False, urgent: bool = False, rating: float = 0,
-            sort: str = "recommended", limit: int = Query(30, le=100), db: Session = Depends(get_db)):
+            sort: str = "recommended", limit: int = Query(30, le=100), slugs: str | None = None,
+            db: Session = Depends(get_db)):
     q = select(m.Master)
+    if slugs:
+        wanted = [x for x in slugs.split(",") if x][:50]
+        q = q.where(m.Master.slug.in_(wanted))
     cat_ids = []
     if service:
         c = db.scalar(select(m.Category).where(m.Category.slug == service))
@@ -185,6 +189,7 @@ class RequestIn(BaseModel):
     service: str | None = None
     district: str | None = None
     master: str | None = None
+    masters: list[str] = Field(default_factory=list, max_length=3)
     description: str = Field(min_length=10, max_length=3000)
     when: str = "asap"
     budget: str = ""
@@ -199,7 +204,9 @@ def create_request(body: RequestIn, db: Session = Depends(get_db)):
     c = db.scalar(select(m.Category).where(m.Category.slug == body.service)) if body.service else None
     d = db.scalar(select(m.District).where(m.District.slug == body.district)) if body.district else None
     ms = db.scalar(select(m.Master).where(m.Master.slug == body.master)) if body.master else None
+    picked = [x for x in body.masters if db.scalar(select(m.Master.id).where(m.Master.slug == x))]
     r = m.ServiceRequest(category_id=c.id if c else None, district_id=d.id if d else None, master_id=ms.id if ms else None,
+                         masters=",".join(picked),
                          description=body.description.strip(), when=body.when, budget=body.budget,
                          contact_name=body.contact_name.strip(), contact=body.contact.strip(), lang=body.lang, urgent=body.urgent)
     db.add(r)
@@ -218,3 +225,20 @@ def sitemap(db: Session = Depends(get_db)):
             pairs.add((s.category.slug, d.slug))
     return {"categories": [c.slug for c in cats], "districts": [d.slug for d in dists], "masters": list(mas),
             "pairs": sorted(pairs)}
+
+
+class LeadIn(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    contact: str = Field(min_length=5, max_length=120)
+    service: str = Field(default="", max_length=200)
+    district: str = Field(default="", max_length=80)
+    lang: str = "sr"
+
+
+@app.post("/api/v1/master-leads", status_code=201)
+def master_lead(body: LeadIn, db: Session = Depends(get_db)):
+    lead = m.MasterLead(name=body.name.strip(), contact=body.contact.strip(), service=body.service.strip(),
+                        district=body.district, lang=body.lang)
+    db.add(lead)
+    db.commit()
+    return {"id": lead.id}

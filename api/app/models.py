@@ -109,6 +109,7 @@ class ServiceRequest(Base):
     category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"))
     district_id: Mapped[int | None] = mapped_column(ForeignKey("districts.id"))
     master_id: Mapped[int | None] = mapped_column(ForeignKey("masters.id"))
+    masters: Mapped[str] = mapped_column(String(400), default="")  # до 3 выбранных мастеров (slug через запятую)
     description: Mapped[str] = mapped_column(Text)
     when: Mapped[str] = mapped_column(String(40), default="asap")
     budget: Mapped[str] = mapped_column(String(40), default="")
@@ -117,4 +118,16 @@ class ServiceRequest(Base):
     lang: Mapped[str] = mapped_column(String(10), default="sr")
     urgent: Mapped[bool] = mapped_column(Boolean, default=False)
     status: Mapped[str] = mapped_column(String(20), default="new")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class MasterLead(Base):
+    """Мастер оставил контакт до открытия регистрации."""
+    __tablename__ = "master_leads"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(80))
+    contact: Mapped[str] = mapped_column(String(120))
+    service: Mapped[str] = mapped_column(String(200), default="")
+    district: Mapped[str] = mapped_column(String(80), default="")
+    lang: Mapped[str] = mapped_column(String(10), default="sr")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

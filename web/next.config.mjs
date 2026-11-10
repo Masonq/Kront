@@ -9,8 +9,9 @@ const nextConfig = {
   },
   async headers() {
     return [
-      { source: "/demo/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=604800" }] },
-      { source: "/((?!_next/static|demo).*)", headers: [{ key: "Cache-Control", value: "no-cache, must-revalidate" }] },
+      { source: "/demo/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }] },
+      { source: "/sec/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }] },
+      { source: "/((?!_next/static|demo|sec).*)", headers: [{ key: "Cache-Control", value: "no-cache, must-revalidate" }] },
     ];
   },
 };

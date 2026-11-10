@@ -3,6 +3,7 @@ import Link from "next/link";
 import Icon from "@/components/Icon";
 import MasterCard from "@/components/MasterCard";
 import SearchBox from "@/components/SearchBox";
+import SectionTile from "@/components/SectionTile";
 import { api } from "@/lib/api";
 import { dict, isLang, tx, type Lang } from "@/lib/i18n";
 import { alternates } from "@/lib/seo";
@@ -47,17 +48,7 @@ export default async function Home({ params }: P) {
           <h2 className="h2">{t.allCategories}</h2>
           <Link href={`/${lang}/usluge`}>{t.seeAll}</Link>
         </div>
-        <div className="cat-grid">
-          {(sections || []).slice(0, 12).map((s) => (
-            <Link key={s.slug} href={`/${lang}/usluge/${s.slug}`} className="cat-card">
-              <span className="ic"><Icon name={s.icon} /></span>
-              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <b>{tx(lang, s.name)}</b>
-                <span>{s.count ? t.masters(s.count) : tx(lang, s.children.slice(0, 2).map((c) => c.name).join(", "))}</span>
-              </span>
-            </Link>
-          ))}
-        </div>
+        <div className="tiles">{(sections || []).slice(0, 8).map((s, i) => <SectionTile key={s.slug} lang={lang} s={s} big={i < 2} />)}</div>
       </section>
 
       {works.length > 0 && (

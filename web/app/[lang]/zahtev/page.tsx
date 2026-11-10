@@ -15,17 +15,19 @@ export default async function Page({ params, searchParams }: P) {
   const { lang: l } = await params;
   const lang = l as Lang;
   const sp = await searchParams;
-  const [sections, districts, master] = await Promise.all([
-    api.catalog(lang), api.districts(lang), sp.master ? api.master(lang, sp.master) : Promise.resolve(null),
+  const slugs = (sp.masters || sp.master || "").split(",").filter(Boolean).slice(0, 3);
+  const [sections, districts, picked] = await Promise.all([
+    api.catalog(lang), api.districts(lang), slugs.length ? api.masters(lang, { slugs: slugs.join(",") }) : Promise.resolve(null),
   ]);
-  const services = (sections || []).map((s) => ({ section: s.name, items: s.children.map((c) => ({ slug: c.slug, name: c.name })) }));
+  const services = (sections || []).map((s) => ({ section: s.name, sectionSlug: s.slug, items: s.children.map((c) => ({ slug: c.slug, name: c.name })) }));
   let service = sp.service;
-  // раздел верхнего уровня → первая подкатегория
   const sec = (sections || []).find((s) => s.slug === service);
   if (sec) service = sec.children[0]?.slug;
-  if (!service && master?.service_list[0]) service = master.service_list[0].slug;
-  return (
-    <RequestForm lang={lang} services={services} districts={(districts || []).map((d) => ({ slug: d.slug, name: d.name }))}
-      init={{ service, district: sp.district, master: master?.slug, q: sp.q }} masterName={master?.name} />
-  );
+  const masters = (picked?.items || []).map((m) => ({ slug: m.slug, name: m.name, photo: m.photo }));
+  if (!service && slugs.length === 1) {
+    const full = await api.master(lang, slugs[0]);
+    service = full?.service_list[0]?.slug;
+  }
+  return <RequestForm lang={lang} services={services} districts={(districts || []).map((d) => ({ slug: d.slug, name: d.name }))}
+    init={{ service, district: sp.district, q: sp.q }} masters={masters} />;
 }

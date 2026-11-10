@@ -86,8 +86,8 @@ export default async function Listing({ lang, slug, district, sp }: { lang: Lang
       <div className="toolbar">
         <div className="chips scroll">
           {FILTERS.map((f) => (
-            <Link key={f} href={toggle(f)} className={`chip${on[f] ? " on" : ""}`} scroll={false} rel="nofollow">
-              {f === "online" && <span className="online-dot" />}{t.filters[f]}
+            <Link key={f} href={toggle(f)} className={`chip${on[f] ? " on" : ""}`} scroll={false} rel="nofollow" aria-label={on[f] ? `${t.clearFilter}: ${t.filters[f]}` : undefined}>
+              {f === "online" && !on[f] && <span className="online-dot" />}{t.filters[f]}{on[f] && <Icon name="close" size={13} stroke={2.4} />}
             </Link>
           ))}
         </div>

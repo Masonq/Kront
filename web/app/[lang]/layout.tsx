@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { Onest, Unbounded } from "next/font/google";
 import Nav from "@/components/Nav";
+import { PickBar } from "@/components/Pick";
 import { api } from "@/lib/api";
 import { dict, htmlLang, isLang, type Lang } from "@/lib/i18n";
 import "../globals.css";
@@ -44,6 +45,7 @@ export default async function Layout({ children, params }: { children: React.Rea
             {children}
             <footer className="footer"><span>{t.footer}</span><span>© {new Date().getFullYear()} Kront</span></footer>
           </main>
+          <PickBar lang={lang} />
         </div>
       </body>
     </html>

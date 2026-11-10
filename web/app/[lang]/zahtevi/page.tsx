@@ -1,7 +1,8 @@
-import EmptyPage from "@/components/EmptyPage";
+import OrdersList from "@/components/OrdersList";
 import { dict, type Lang } from "@/lib/i18n";
-export const metadata = { robots: { index: false } };
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  return { title: dict((await params).lang as Lang).ordersTitle, robots: { index: false } };
+}
 export default async function Page({ params }: { params: Promise<{ lang: string }> }) {
-  const lang = (await params).lang as Lang; const t = dict(lang);
-  return <EmptyPage title={t.orders} text={t.ordEmpty} cta={t.newRequest} href={`/${lang}/zahtev`} icon="orders" />;
+  return <OrdersList lang={(await params).lang as Lang} />;
 }
