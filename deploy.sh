@@ -19,10 +19,18 @@ LOG=reports/deploy.log
     done
     echo "-> выбран порт $(grep '^WEB_PORT=' .env | cut -d= -f2)"
   fi
+  # бесплатный домен sslip.io: имя сразу указывает на IP сервера
+  if ! grep -q '^DOMAIN=' .env; then
+    IP=$(curl -s4 --max-time 5 https://ifconfig.me || hostname -I | awk '{print $1}')
+    echo "DOMAIN=kront.${IP//./-}.sslip.io" >> .env
+    sed -i '/^SITE_URL=/d' .env
+    echo "SITE_URL=https://kront.${IP//./-}.sslip.io" >> .env
+  fi
   set -a; . ./.env; set +a
   git pull --ff-only
   docker compose up -d --build --remove-orphans
   docker image prune -f >/dev/null
+  bash ./scripts/domain.sh "$DOMAIN" "$WEB_PORT"
   sleep 8
   echo "-> контейнеры:"; docker compose ps -a --format "table {{.Service}}\t{{.State}}\t{{.Status}}"
   echo "-> проверки:"
@@ -31,6 +39,9 @@ LOG=reports/deploy.log
     printf "%s %s\n" "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:${WEB_PORT}$u")" "$u"
   done
   curl -s "http://127.0.0.1:${WEB_PORT}/ru" | grep -q "kront" && echo "-> на порту отвечает именно Kront" || echo "-> ВНИМАНИЕ: на порту отвечает не Kront"
+  echo "-> снаружи по домену:"
+  printf "%s http://%s/ru\n" "$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://$DOMAIN/ru")" "$DOMAIN"
+  printf "%s https://%s/ru\n" "$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://$DOMAIN/ru")" "$DOMAIN"
   echo "-> последние логи api:"; docker compose logs --tail=15 api 2>&1 | tail -15
 } > "$LOG" 2>&1
 cat "$LOG" | tail -25
