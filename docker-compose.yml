@@ -25,11 +25,38 @@ services:
       ADMIN_TG_IDS: ${ADMIN_TG_IDS:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      DIDIT_API_KEY: ${DIDIT_API_KEY:-}
+      DIDIT_WORKFLOW_ID: ${DIDIT_WORKFLOW_ID:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
+      TG_API_ID: ${TG_API_ID:-}
+      TG_SESSION: ${TG_SESSION:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       SMTP_FROM: ${SMTP_FROM:-}
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  collector:
+    build: ./api
+    restart: unless-stopped
+    command: ["python", "-m", "app.collector"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://kront:${DB_PASSWORD:-kront}@db:5432/kront
+      UPLOADS_DIR: /data/uploads
+      SITE_URL: ${SITE_URL:-}
+      TG_API_ID: ${TG_API_ID:-}
+      TG_API_HASH: ${TG_API_HASH:-}
+      TG_SESSION: ${TG_SESSION:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4o-mini}
     volumes:
       - uploads:/data/uploads
     depends_on:

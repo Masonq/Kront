@@ -11,6 +11,8 @@ from .account import router as account_router, start_bot, current_user, match_ma
 
 app = FastAPI(title="Kront API", version="0.2.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
 app.include_router(account_router)
+from .extra import router as extra_router  # noqa: E402
+app.include_router(extra_router)
 
 CYR = {"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ђ": "dj", "е": "e", "ж": "z", "з": "z", "и": "i", "ј": "j", "к": "k",
        "л": "l", "љ": "lj", "м": "m", "н": "n", "њ": "nj", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "ћ": "c", "у": "u",
@@ -67,6 +69,7 @@ def master_card(ms: m.Master, lang: str, service_slug: str | None = None):
         "price_from": (main.price_from if main else (min(prices) if prices else 0)),
         "districts": [loc(d, "name", lang) for d in ms.districts],
         "works": [w.photo for w in ms.works],
+        "claimed": ms.claimed, "tg": ms.tg_username if not ms.claimed else "",
     }
 
 
@@ -136,13 +139,15 @@ def masters(lang: str = "sr", service: str | None = None, district: str | None =
         q = q.where(m.Master.urgent.is_(True))
     if rating:
         q = q.where(m.Master.rating >= rating)
+    from .extra import refresh_online
+    refresh_online(db)
     items = list(db.scalars(q))
 
     def score(x: m.Master):
         # байесовский рейтинг + верификация + скорость ответа + онлайн
         C, M = 4.5, 20
         bayes = (C * M + x.rating * x.reviews_count) / (M + x.reviews_count)
-        return bayes * 10 + x.level * 2 + (3 if x.online else 0) - min(x.reply_min, 60) / 20
+        return bayes * 10 + x.level * 2 + (3 if x.online else 0) - min(x.reply_min, 60) / 20 - (30 if not x.claimed else 0)
     if sort == "rating":
         items.sort(key=lambda x: (x.rating, x.reviews_count), reverse=True)
     elif sort == "price":
@@ -162,6 +167,7 @@ def master(slug: str, lang: str = "sr", db: Session = Depends(get_db)):
     reviews = db.scalars(select(m.Review).where(m.Review.master_id == ms.id).order_by(m.Review.created_at.desc())).all()
     return {**master_card(ms, lang), "about": ms.about_ru if lang == "ru" else ms.about_sr,
             "experience_years": ms.experience_years, "warranty_months": ms.warranty_months, "claimed": ms.claimed,
+            "source_url": ms.source_url if not ms.claimed else "",
             "service_list": [{"slug": s.category.slug, "name": loc(s.category, "name", lang), "price_from": s.price_from,
                               "unit": s.category.unit} for s in ms.services],
             "district_list": [dist_out(d, lang) for d in ms.districts],

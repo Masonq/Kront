@@ -264,6 +264,8 @@ def start_bot():
 def notify_user(db: Session, user_id: int | None, text: str, path: str = ""):
     if not user_id:
         return
+    from .extra import push_user
+    push_user(user_id, "Kront", text, path or "/")
     u = db.get(m.User, user_id)
     if u and u.tg_id:
         threading.Thread(target=tg_send, args=(u.tg_id, text, f"{SITE}{path}" if SITE else None, "Kront"), daemon=True).start()
@@ -500,7 +502,14 @@ def master_request_action(rid: int, action: str, u: m.User = Depends(need_user),
         return {"ok": True}
     if action != "take":
         raise HTTPException(400)
+    if r.urgent and db.scalar(select(m.RequestMatch.id).where(m.RequestMatch.request_id == rid, m.RequestMatch.status == "taken")):
+        rm.status = "closed"
+        db.commit()
+        raise HTTPException(409, "already_taken")
     rm.status = "taken"
+    if r.urgent:
+        for other in db.scalars(select(m.RequestMatch).where(m.RequestMatch.request_id == rid, m.RequestMatch.id != rm.id, m.RequestMatch.status == "pending")):
+            other.status = "closed"
     if not r.user_id:
         db.commit()
         return {"ok": True, "conversation": None, "contact": r.contact}
@@ -514,7 +523,18 @@ def master_request_action(rid: int, action: str, u: m.User = Depends(need_user),
 
 
 def match_masters(db: Session, r: m.ServiceRequest, picked: list[str]):
-    q = select(m.Master).where(m.Master.hidden.is_(False))
+    q = select(m.Master).where(m.Master.hidden.is_(False), m.Master.claimed.is_(True))
+    if r.urgent and not picked:
+        from .extra import refresh_online
+        refresh_online(db)
+        q2 = q.where(m.Master.services.any(m.MasterService.category_id == r.category_id)) if r.category_id else q
+        q2 = q2.where(m.Master.districts.any(m.District.id == r.district_id)) if r.district_id else q2
+        found = [x for x in db.scalars(q2) if x.online][:15]
+        for ms in found:
+            db.add(m.RequestMatch(request_id=r.id, master_id=ms.id))
+            notify_user(db, ms.user_id, f"⚡ {'Хитно' if r.lang == 'ru' else 'Hitno'}: {r.description[:120]}", f"/{'ru' if r.lang == 'ru' else 'sr'}/kabinet")
+        if found:
+            return
     if picked:
         found = list(db.scalars(q.where(m.Master.slug.in_(picked))))[:3]
     else:
@@ -583,6 +603,9 @@ def badges(u: m.User | None = Depends(current_user), db: Session = Depends(get_d
         return {"messages": 0, "requests": 0}
     total = sum(c["unread"] for c in conversations(u, db))
     ms = my_master(db, u)
+    if ms:
+        ms.last_seen, ms.online = datetime.utcnow(), True
+        db.commit()
     pend = db.scalar(select(func.count(m.RequestMatch.id)).where(m.RequestMatch.master_id == ms.id, m.RequestMatch.status == "pending")) if ms else 0
     return {"messages": total, "requests": pend}
 
@@ -681,6 +704,8 @@ def order_action(oid: int, action: str, body: OrderAct | None = None, u: m.User 
         o.final_price = (body.final_price if body and body.final_price else o.price)
     if new == "confirmed":
         ms.orders_count += 1
+        from .extra import auto_level
+        auto_level(ms)
     _system(db, conv, f"order_{new}|{o.title}")
     db.commit()
     to = ms.user_id if side == "client" else conv.client_id
@@ -714,6 +739,8 @@ def review(oid: int, body: ReviewIn, u: m.User = Depends(need_user), db: Session
     stats = db.execute(select(func.count(m.Review.id), func.avg(m.Review.rating)).where(m.Review.master_id == ms.id)).one()
     ms.reviews_count = stats[0]
     ms.rating = round(float(stats[1] or 0), 2)
+    from .extra import auto_level
+    auto_level(ms)
     _system(db, conv, "review_left|")
     db.commit()
     return {"ok": True}
@@ -743,7 +770,7 @@ def admin_overview(a: m.User = Depends(need_admin), db: Session = Depends(get_db
         "leads": [{"id": x.id, "name": x.name, "contact": x.contact, "service": x.service, "district": x.district, "at": x.created_at.isoformat() + "Z"}
                   for x in db.scalars(select(m.MasterLead).order_by(m.MasterLead.id.desc()).limit(100))],
         "masters": [{"id": x.id, "slug": x.slug, "name": x.name, "demo": x.demo, "hidden": x.hidden, "level": x.level, "rating": x.rating,
-                     "reviews": x.reviews_count, "user": bool(x.user_id)}
+                     "reviews": x.reviews_count, "user": bool(x.user_id), "claimed": x.claimed}
                     for x in db.scalars(select(m.Master).order_by(m.Master.id.desc()).limit(300))],
         "reviews": [{"id": r.id, "master_id": r.master_id, "author": r.author, "rating": r.rating, "text": r.text[:300]}
                     for r in db.scalars(select(m.Review).order_by(m.Review.id.desc()).limit(100))],

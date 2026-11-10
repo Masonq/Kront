@@ -64,6 +64,13 @@ class Master(Base):
     user_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
     phone: Mapped[str] = mapped_column(String(60), default="")
     hidden: Mapped[bool] = mapped_column(Boolean, default=False)
+    last_seen: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    source_url: Mapped[str] = mapped_column(String(255), default="")
+    tg_username: Mapped[str] = mapped_column(String(80), default="", index=True)
+    claim_token: Mapped[str] = mapped_column(String(40), default="", index=True)
+    invite_state: Mapped[str] = mapped_column(String(20), default="")  # "" | asked | linked | declined
+    kyc_session: Mapped[str] = mapped_column(String(80), default="")
+    kyc_status: Mapped[str] = mapped_column(String(30), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     services: Mapped[list["MasterService"]] = relationship(cascade="all, delete-orphan", lazy="selectin")
     districts: Mapped[list[District]] = relationship(secondary=master_districts, lazy="selectin")
@@ -233,3 +240,63 @@ class Message(Base):
     body: Mapped[str] = mapped_column(Text, default="")
     order_id: Mapped[int | None] = mapped_column(ForeignKey("orders.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+# ===================== Уведомления, проверка, перевод, сборщик =====================
+
+class PushSub(Base):
+    __tablename__ = "push_subs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    endpoint: Mapped[str] = mapped_column(Text, unique=True)
+    p256dh: Mapped[str] = mapped_column(String(200))
+    auth: Mapped[str] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class VerifDoc(Base):
+    """Документ для уровня 2 «Профи» (лицензия, сертификат, регистрация предузетника)."""
+    __tablename__ = "verif_docs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    master_id: Mapped[int] = mapped_column(ForeignKey("masters.id", ondelete="CASCADE"), index=True)
+    kind: Mapped[str] = mapped_column(String(40), default="license")
+    file: Mapped[str] = mapped_column(String(255))
+    status: Mapped[str] = mapped_column(String(20), default="pending")  # pending | approved | rejected
+    note: Mapped[str] = mapped_column(String(300), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class MsgTranslation(Base):
+    __tablename__ = "msg_translations"
+    __table_args__ = (UniqueConstraint("message_id", "lang"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    message_id: Mapped[int] = mapped_column(ForeignKey("messages.id", ondelete="CASCADE"), index=True)
+    lang: Mapped[str] = mapped_column(String(5))
+    text: Mapped[str] = mapped_column(Text)
+
+
+class TgSource(Base):
+    """Открытый Telegram-чат, из которого сборщик берёт объявления мастеров."""
+    __tablename__ = "tg_sources"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    handle: Mapped[str] = mapped_column(String(120), unique=True)  # @chat или t.me/chat
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_msg_id: Mapped[int] = mapped_column(Integer, default=0)
+    found: Mapped[int] = mapped_column(Integer, default=0)
+    checked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    error: Mapped[str] = mapped_column(String(300), default="")
+
+
+class TgStop(Base):
+    """Стоп-лист: телефоны и @username тех, кто попросил удалить данные."""
+    __tablename__ = "tg_stop"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(120), unique=True)
+
+
+class RemovalRequest(Base):
+    __tablename__ = "removal_requests"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    master_id: Mapped[int | None] = mapped_column(Integer)
+    contact: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
