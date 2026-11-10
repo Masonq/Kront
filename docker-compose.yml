@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kront
+      POSTGRES_USER: kront
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-kront}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kront -d kront"]
+      interval: 5s
+      retries: 20
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://kront:${DB_PASSWORD:-kront}@db:5432/kront
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    restart: unless-stopped
+    environment:
+      API_INTERNAL: http://api:8000
+      SITE_URL: ${SITE_URL:-http://89.208.113.147:8095}
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-8095}:3000"
+
+volumes:
+  dbdata:
